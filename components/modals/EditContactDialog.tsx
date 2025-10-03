@@ -22,19 +22,30 @@ type Props = {
   };
   onUpdated?: () => void;
   trigger?: React.ReactNode;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 };
 
-export function EditContactDialog({ contact, onUpdated, trigger }: Props) {
-  const [open, setOpen] = useState(false);
+export function EditContactDialog({
+  contact,
+  onUpdated,
+  trigger,
+  open,
+  onOpenChange,
+}: Props) {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isControlled = typeof open === "boolean";
+  const isOpen = isControlled ? open : internalOpen;
+  const setOpen = isControlled && onOpenChange ? onOpenChange : setInternalOpen;
   const [loading, setLoading] = useState(false);
 
   async function onSubmit(formData: FormData) {
     setLoading(true);
-    const payload: any = {
-      name: formData.get("name"),
-      role: formData.get("role"),
-      email: formData.get("email"),
-      phone: formData.get("phone"),
+    const payload = {
+      name: String(formData.get("name") || ""),
+      role: (formData.get("role") as string) || "",
+      email: (formData.get("email") as string) || "",
+      phone: (formData.get("phone") as string) || "",
     };
     await fetch(`/api/contacts/${contact.id}`, {
       method: "PATCH",
@@ -48,10 +59,8 @@ export function EditContactDialog({ contact, onUpdated, trigger }: Props) {
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        {trigger ?? <Button variant="outline">Edit</Button>}
-      </DialogTrigger>
+    <Dialog open={isOpen} onOpenChange={setOpen}>
+      {trigger ? <DialogTrigger asChild>{trigger}</DialogTrigger> : null}
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Edit contact</DialogTitle>

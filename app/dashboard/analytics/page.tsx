@@ -1,16 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  LineChart,
-  Line,
-  CartesianGrid,
-} from "recharts";
+import { StatusBarChart } from "@/components/analytics/StatusBarChart";
+import { TimelineLineChart } from "@/components/analytics/TimelineLineChart";
 
 export default async function AnalyticsPage() {
   const { userId } = await auth();
@@ -21,7 +12,7 @@ export default async function AnalyticsPage() {
   const statusCounts = ["APPLIED", "INTERVIEW", "OFFER", "REJECTED"].map(
     (k) => ({
       status: k,
-      count: jobs.filter((j) => j.status === (k as any)).length,
+      count: jobs.filter((j) => j.status === k).length,
     })
   );
 
@@ -53,37 +44,12 @@ export default async function AnalyticsPage() {
       <div className="grid gap-6 lg:grid-cols-2">
         <div className="rounded-lg border bg-white p-4">
           <h2 className="text-base font-semibold">Applications per status</h2>
-          <div className="mt-4 h-64 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={statusCounts}>
-                <XAxis dataKey="status" />
-                <YAxis allowDecimals={false} />
-                <Tooltip />
-                <Bar dataKey="count" fill="#111827" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+          <StatusBarChart data={statusCounts} />
         </div>
 
         <div className="rounded-lg border bg-white p-4">
           <h2 className="text-base font-semibold">Applications over time</h2>
-          <div className="mt-4 h-64 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={timeline}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis allowDecimals={false} />
-                <Tooltip />
-                <Line
-                  type="monotone"
-                  dataKey="count"
-                  stroke="#111827"
-                  strokeWidth={2}
-                  dot={false}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
+          <TimelineLineChart data={timeline} />
         </div>
       </div>
 

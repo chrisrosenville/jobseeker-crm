@@ -42,14 +42,14 @@ export function EditJobDialog({ job, onUpdated, trigger }: Props) {
 
   async function onSubmit(formData: FormData) {
     setLoading(true);
-    const payload: any = {
-      title: formData.get("title"),
-      company: formData.get("company"),
-      link: formData.get("link") || null,
+    const payload = {
+      title: String(formData.get("title") || ""),
+      company: String(formData.get("company") || ""),
+      link: (formData.get("link") as string) || null,
       salary: formData.get("salary") ? Number(formData.get("salary")) : null,
-      dateApplied: formData.get("dateApplied") || undefined,
-      notes: formData.get("notes") || null,
-      status: formData.get("status"),
+      dateApplied: (formData.get("dateApplied") as string) || undefined,
+      notes: (formData.get("notes") as string) || null,
+      status: formData.get("status") as JobStatus,
     };
     await fetch(`/api/jobs/${job.id}`, {
       method: "PATCH",

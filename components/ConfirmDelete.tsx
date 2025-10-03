@@ -12,27 +12,33 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
 
 export function ConfirmDelete({
   onConfirm,
   children,
   title = "Delete",
   description = "This action cannot be undone.",
+  open,
+  onOpenChange,
 }: {
   onConfirm?: () => Promise<void> | void;
   children?: React.ReactNode;
   title?: string;
   description?: string;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }) {
-  const [open, setOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isControlled = typeof open === "boolean";
+  const isOpen = isControlled ? open : internalOpen;
+  const setOpen = isControlled && onOpenChange ? onOpenChange : setInternalOpen;
   const [loading, setLoading] = useState(false);
 
   return (
-    <AlertDialog open={open} onOpenChange={setOpen}>
-      <AlertDialogTrigger asChild>
-        {children ?? <Button variant="destructive">Delete</Button>}
-      </AlertDialogTrigger>
+    <AlertDialog open={isOpen} onOpenChange={setOpen}>
+      {children ? (
+        <AlertDialogTrigger asChild>{children}</AlertDialogTrigger>
+      ) : null}
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>{title}</AlertDialogTitle>

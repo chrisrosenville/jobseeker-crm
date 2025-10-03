@@ -11,32 +11,48 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { EditJobDialog } from "@/components/modals/EditJobDialog";
 import { ConfirmDelete } from "@/components/ConfirmDelete";
 import { Job } from "@/lib/types";
 import { MoreVertical, Pencil, Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
-export function KanbanCard({ job }: { job: Job }) {
+export function KanbanCard({
+  job,
+  isDraggingGhost,
+}: {
+  job: Job;
+  isDraggingGhost?: boolean;
+}) {
   const { attributes, listeners, setNodeRef, transform, isDragging } =
     useDraggable({ id: job.id });
+
   const style = transform
-    ? { transform: `translate3d(${transform.x}px, ${transform.y}px, 0)` }
+    ? {
+        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+        transition: "none",
+      }
     : undefined;
+
+  const router = useRouter();
 
   return (
     <div
       ref={setNodeRef}
       style={style}
-      {...listeners}
-      {...attributes}
-      className={isDragging ? "opacity-70" : undefined}
+      className={isDragging || isDraggingGhost ? "opacity-0" : undefined}
     >
-      <Card className="cursor-grab p-3">
+      <Card
+        className="p-3 transition shadow-xs hover:shadow-sm hover:bg-accent/30 cursor-grab active:cursor-grabbing"
+        {...attributes}
+        {...listeners}
+      >
         <div className="flex items-start justify-between gap-2">
-          <Link href={`/dashboard/jobs/${job.id}`} className="block">
-            <div className="text-sm font-medium">{job.title}</div>
-            <div className="text-xs text-gray-500">{job.company}</div>
-          </Link>
+          <div className="flex items-start gap-2">
+            <Link href={`/dashboard/jobs/${job.id}`} className="block">
+              <div className="text-sm font-medium leading-5">{job.title}</div>
+              <div className="text-xs text-muted-foreground">{job.company}</div>
+            </Link>
+          </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -44,19 +60,18 @@ export function KanbanCard({ job }: { job: Job }) {
                 variant="ghost"
                 className="h-7 w-7"
                 aria-label="Actions"
+                onPointerDown={(e) => e.stopPropagation()}
+                onClick={(e) => e.stopPropagation()}
               >
                 <MoreVertical className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-40">
-              <EditJobDialog
-                job={job}
-                trigger={
-                  <DropdownMenuItem>
-                    <Pencil className="mr-2 h-4 w-4" /> Edit
-                  </DropdownMenuItem>
-                }
-              />
+              <DropdownMenuItem
+                onClick={() => router.push(`/dashboard/jobs/${job.id}/edit`)}
+              >
+                <Pencil className="mr-2 h-4 w-4" /> Edit
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <ConfirmDelete
                 onConfirm={async () => {
