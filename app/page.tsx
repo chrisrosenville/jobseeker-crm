@@ -1,103 +1,158 @@
+import { currentUser } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
+import Link from "next/link";
 import Image from "next/image";
+import { KanbanSquare, Users, FileText, BarChart3 } from "lucide-react";
 
-export default function Home() {
+export default async function Home() {
+  const user = await currentUser();
+  if (user) redirect("/dashboard");
+
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <main>
+      {/* Header */}
+      <header className="sticky top-0 z-10 w-full bg-white/70 backdrop-blur supports-[backdrop-filter]:bg-white/60">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+          <Link
+            href="/"
+            className="flex items-center gap-2 text-base font-semibold"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+            <span className="inline-block h-2 w-2 rounded-full bg-black" />
+            JobSeeker CRM
+          </Link>
+          <nav className="flex items-center gap-3 text-sm">
+            <Link href="#features" className="hover:underline">
+              Features
+            </Link>
+            <Link href="#preview" className="hover:underline">
+              Preview
+            </Link>
+            <div className="ml-2 hidden h-5 w-px bg-gray-200 sm:block" />
+            <Link
+              href="/auth/signin"
+              className="rounded-md px-3 py-1.5 text-sm font-medium hover:bg-gray-50"
+            >
+              Sign in
+            </Link>
+            <Link
+              href="/auth/signup"
+              className="rounded-md bg-black px-3 py-1.5 text-sm font-medium text-white hover:bg-black/90"
+            >
+              Create account
+            </Link>
+          </nav>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+      </header>
+
+      {/* Hero */}
+      <section className="relative overflow-hidden pb-20 pt-20 sm:pb-24 sm:pt-28">
+        <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,rgba(0,0,0,0.08),transparent_60%)]" />
+        <div className="mx-auto max-w-6xl px-6 text-center">
+          <h1 className="mx-auto max-w-3xl text-balance text-4xl font-bold tracking-tight sm:text-5xl">
+            Stay organized and land your next role faster
+          </h1>
+          <p className="text-muted-foreground mx-auto mt-4 max-w-2xl">
+            Manage applications, track stages on a Kanban board, keep notes, and
+            never lose a recruiter contact again.
+          </p>
+          <div className="mt-8 flex items-center justify-center gap-3">
+            <Link
+              href="/auth/signup"
+              className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white hover:bg-black/90"
+            >
+              Get started
+            </Link>
+            <Link
+              href="#features"
+              className="rounded-md border px-4 py-2 text-sm font-medium hover:bg-gray-50"
+            >
+              Learn more
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Features */}
+      <section id="features" className="border-t bg-white py-16">
+        <div className="mx-auto max-w-6xl px-6">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="rounded-lg border p-6">
+              <KanbanSquare className="h-6 w-6" />
+              <h3 className="mt-4 text-base font-semibold">Kanban board</h3>
+              <p className="text-muted-foreground mt-2 text-sm">
+                Drag and drop between stages: Applied, Interview, Offer,
+                Rejected.
+              </p>
+            </div>
+            <div className="rounded-lg border p-6">
+              <Users className="h-6 w-6" />
+              <h3 className="mt-4 text-base font-semibold">Contacts</h3>
+              <p className="text-muted-foreground mt-2 text-sm">
+                Store recruiter and interviewer info linked to each application.
+              </p>
+            </div>
+            <div className="rounded-lg border p-6">
+              <FileText className="h-6 w-6" />
+              <h3 className="mt-4 text-base font-semibold">Notes</h3>
+              <p className="text-muted-foreground mt-2 text-sm">
+                Keep interview prep, reminders, and follow-ups all in one place.
+              </p>
+            </div>
+            <div className="rounded-lg border p-6">
+              <BarChart3 className="h-6 w-6" />
+              <h3 className="mt-4 text-base font-semibold">Analytics</h3>
+              <p className="text-muted-foreground mt-2 text-sm">
+                See progress across stages and optimize your job search.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Preview */}
+      <section id="preview" className="bg-gray-50 py-16">
+        <div className="mx-auto max-w-6xl px-6">
+          <div className="rounded-xl border bg-white p-4 shadow-sm">
+            <div className="relative aspect-[16/9] w-full overflow-hidden rounded-lg border">
+              <Image
+                src="/window.svg"
+                alt="App preview"
+                fill
+                className="object-contain p-6"
+                priority
+              />
+            </div>
+          </div>
+          <div className="mt-6 text-center">
+            <Link
+              href="/auth/signup"
+              className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white hover:bg-black/90"
+            >
+              Create your free account
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="border-t bg-white py-10">
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 sm:flex-row">
+          <p className="text-sm text-gray-500">
+            © {new Date().getFullYear()} JobSeeker CRM
+          </p>
+          <div className="flex items-center gap-4 text-sm text-gray-500">
+            <Link href="#features" className="hover:underline">
+              Features
+            </Link>
+            <Link href="/auth/signin" className="hover:underline">
+              Sign in
+            </Link>
+            <Link href="/auth/signup" className="hover:underline">
+              Create account
+            </Link>
+          </div>
+        </div>
       </footer>
-    </div>
+    </main>
   );
 }
