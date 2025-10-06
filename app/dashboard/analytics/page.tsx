@@ -41,27 +41,27 @@ export default async function AnalyticsPage() {
     <div className="space-y-8">
       <h1 className="text-2xl font-semibold">Analytics</h1>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <div className="rounded-lg border bg-white p-4">
+      <div className="grid gap-6">
+        <div className="rounded-xl border bg-card p-6 shadow-sm">
           <h2 className="text-base font-semibold">Applications per status</h2>
           <StatusBarChart data={statusCounts} />
         </div>
 
-        <div className="rounded-lg border bg-white p-4">
+        <div className="rounded-xl border bg-card p-6 shadow-sm">
           <h2 className="text-base font-semibold">Applications over time</h2>
           <TimelineLineChart data={timeline} />
         </div>
       </div>
 
-      <div className="rounded-lg border bg-white p-4">
+      <div className="rounded-xl border bg-card p-6 shadow-sm">
         <h2 className="text-base font-semibold">Conversion funnel</h2>
         <div className="mt-4 grid gap-3 sm:grid-cols-3">
           {conversions.map((c) => (
             <div
               key={c.stage}
-              className="rounded border bg-gray-50 p-4 text-center"
+              className="rounded border bg-muted p-4 text-center"
             >
-              <div className="text-sm text-gray-500">{c.stage}</div>
+              <div className="text-sm text-muted-foreground">{c.stage}</div>
               <div className="text-2xl font-bold">{c.value}</div>
             </div>
           ))}

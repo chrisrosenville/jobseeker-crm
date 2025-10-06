@@ -11,6 +11,7 @@ import {
   LayoutDashboard,
   Users,
   BarChart3,
+  Settings,
   Menu,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -83,6 +84,11 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                             <BarChart3 className="h-4 w-4" /> Analytics
                           </span>
                         </NavLink>
+                        <NavLink href="/dashboard/settings">
+                          <span className="inline-flex items-center gap-2">
+                            <Settings className="h-4 w-4" /> Settings
+                          </span>
+                        </NavLink>
                       </nav>
                     </SheetContent>
                   </Sheet>
@@ -114,6 +120,11 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                 <NavLink href="/dashboard/analytics">
                   <span className="inline-flex items-center gap-2">
                     <BarChart3 className="h-4 w-4" /> Analytics
+                  </span>
+                </NavLink>
+                <NavLink href="/dashboard/settings">
+                  <span className="inline-flex items-center gap-2">
+                    <Settings className="h-4 w-4" /> Settings
                   </span>
                 </NavLink>
               </nav>

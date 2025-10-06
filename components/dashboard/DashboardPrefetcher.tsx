@@ -12,6 +12,7 @@ export function DashboardPrefetcher() {
       "/dashboard/jobs",
       "/dashboard/contacts",
       "/dashboard/analytics",
+      "/dashboard/settings",
     ];
     for (const r of routes) router.prefetch(r);
   }, [router]);
