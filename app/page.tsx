@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { BadgeCheck } from "lucide-react";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
 export default async function Home() {
   const user = await currentUser();
@@ -10,41 +12,7 @@ export default async function Home() {
 
   return (
     <main className="bg-background text-foreground">
-      {/* Header */}
-      <header className="sticky top-0 z-10 w-full bg-background/70 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <Link
-            href="/"
-            className="flex items-center gap-2 text-base font-semibold"
-          >
-            JobSeeker CRM
-          </Link>
-          <nav className="flex items-center gap-3 text-sm">
-            <Link href="#why" className="hover:underline">
-              Features
-            </Link>
-            <Link href="#how" className="hover:underline">
-              How it works
-            </Link>
-            <Link href="#preview" className="hover:underline">
-              Preview
-            </Link>
-            <div className="ml-2 hidden h-5 w-px bg-border sm:block" />
-            <Link
-              href="/auth/signin"
-              className="rounded-md px-3 py-1.5 text-sm font-medium hover:bg-accent hover:text-accent-foreground"
-            >
-              Sign in
-            </Link>
-            <Link
-              href="/auth/signup"
-              className="rounded-md bg-foreground px-3 py-1.5 text-sm font-medium text-background hover:bg-foreground/90"
-            >
-              Create account
-            </Link>
-          </nav>
-        </div>
-      </header>
+      <Header />
 
       {/* Hero */}
       <section className="relative overflow-hidden py-20 sm:py-28">
@@ -264,86 +232,7 @@ export default async function Home() {
         </div>
       </section> */}
 
-      {/* Footer */}
-      <footer className="relative bg-background">
-        <div className="border-t" />
-        <div className="mx-auto max-w-6xl px-6 py-12">
-          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-            <div className="col-span-1">
-              <div className="flex items-center gap-2 text-base font-semibold">
-                JobSeeker CRM
-              </div>
-              <p className="text-muted-foreground mt-3 text-sm">
-                A clean, focused workspace for managing your job search—from
-                first application to final offer.
-              </p>
-            </div>
-            <div>
-              <h4 className="text-sm font-semibold">Product</h4>
-              <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-                <li>
-                  <Link href="#why" className="hover:underline">
-                    Why JobSeeker
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#how" className="hover:underline">
-                    How it works
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#preview" className="hover:underline">
-                    Preview
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-sm font-semibold">Support</h4>
-              <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-                <li>
-                  <a href="#" className="hover:underline">
-                    Guides
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:underline">
-                    Contact us
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-sm font-semibold">Account</h4>
-              <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-                <li>
-                  <Link href="/auth/signin" className="hover:underline">
-                    Sign in
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/auth/signup" className="hover:underline">
-                    Create account
-                  </Link>
-                </li>
-              </ul>
-            </div>
-          </div>
-          <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t pt-6 text-sm text-muted-foreground sm:flex-row">
-            <p>
-              © {new Date().getFullYear()} JobSeeker CRM. All rights reserved.
-            </p>
-            <div className="flex items-center gap-4">
-              <a href="#" className="hover:underline">
-                Privacy
-              </a>
-              <a href="#" className="hover:underline">
-                Terms
-              </a>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </main>
   );
 }
