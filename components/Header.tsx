@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ThemeToggle } from "@/components/settings/ThemeToggle";
 
 export default function Header() {
   return (
@@ -11,15 +12,9 @@ export default function Header() {
           JobSeeker CRM
         </Link>
         <nav className="flex items-center gap-3 text-sm">
-          <Link href="#why" className="hover:underline">
-            Features
-          </Link>
-          <Link href="#how" className="hover:underline">
-            How it works
-          </Link>
-          <Link href="#preview" className="hover:underline">
-            Preview
-          </Link>
+          {/* Theme Toggle */}
+          <ThemeToggle />
+
           <div className="ml-2 hidden h-5 w-px bg-border sm:block" />
           <Link
             href="/auth/signin"

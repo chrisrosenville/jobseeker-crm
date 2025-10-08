@@ -1,11 +1,5 @@
 import { ReactNode, Suspense } from "react";
-import {
-  SignedIn,
-  SignedOut,
-  RedirectToSignIn,
-  UserButton,
-} from "@clerk/nextjs";
-import { BriefcaseBusiness } from "lucide-react";
+import { SignedIn, SignedOut, RedirectToSignIn } from "@clerk/nextjs";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { DashboardPrefetcher } from "@/components/dashboard/DashboardPrefetcher";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
