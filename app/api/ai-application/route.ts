@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import OpenAI from "openai";
+import { z } from "zod";
 
 // @ts-expect-error - Expecting error since we're not importing from the default index file in the package.
 import pdfParse from "pdf-parse/lib/pdf-parse.js";
@@ -14,11 +15,69 @@ export async function POST(request: Request) {
   try {
     const formData = await request.formData();
     const resumeFile = formData.get("resume");
-    const jobPost = String(formData.get("jobPost") ?? "");
-    const creativity = Number(formData.get("creativity") ?? 0.6);
-    const age = String(formData.get("age") ?? "");
-    const tone = String(formData.get("tone") ?? "professional");
-    const language = String(formData.get("language") ?? "en");
+
+    const schema = z.object({
+      jobPost: z.string().max(10_000).optional().default(""),
+      creativity: z
+        .string()
+        .transform((v) => Number(v))
+        .refine((n) => !Number.isNaN(n), { message: "Invalid creativity" })
+        .transform((n) => Math.min(Math.max(n, 0.1), 1)),
+      age: z
+        .string()
+        .transform((v) => Number(v))
+        .refine((n) => Number.isInteger(n) && n >= 14 && n <= 100, {
+          message: "Invalid age",
+        }),
+      tone: z.preprocess(
+        (v) => String(v ?? "").toLowerCase(),
+        z
+          .enum([
+            "formal",
+            "professional",
+            "conversational",
+            "friendly",
+            "enthusiastic",
+          ])
+          .default("professional")
+      ),
+      language: z.preprocess(
+        (v) => String(v ?? "").toLowerCase(),
+        z
+          .enum([
+            "en",
+            "de",
+            "fr",
+            "es",
+            "it",
+            "nl",
+            "sv",
+            "da",
+            "no",
+            "fi",
+            "pl",
+            "pt",
+          ])
+          .default("en")
+      ),
+    });
+
+    const parsed = schema.safeParse({
+      jobPost: formData.get("jobPost") ?? "",
+      creativity: formData.get("creativity") ?? "0.6",
+      age: formData.get("age") ?? "",
+      tone: formData.get("tone") ?? "professional",
+      language: formData.get("language") ?? "en",
+    });
+
+    if (!parsed.success) {
+      return NextResponse.json(
+        { message: "Validation failed", errors: parsed.error.issues },
+        { status: 400 }
+      );
+    }
+
+    const { jobPost, creativity, age, tone, language } = parsed.data;
 
     if (!resumeFile || !(resumeFile instanceof File)) {
       return NextResponse.json(
@@ -27,15 +86,11 @@ export async function POST(request: Request) {
       );
     }
 
-    if (!age || Number.isNaN(Number(age))) {
-      return NextResponse.json(
-        { message: "Invalid or missing age" },
-        { status: 400 }
-      );
-    }
-
     const resumeBuffer = Buffer.from(await resumeFile.arrayBuffer());
-    const resumeText = await pdfParse(resumeBuffer);
+    const resumeParsed = await pdfParse(resumeBuffer);
+    type PdfParseResult = { text?: string };
+    const pdfResult = resumeParsed as PdfParseResult;
+    const resumeText = pdfResult.text?.trim().slice(0, 120_000) || "";
 
     if (!resumeText) {
       return NextResponse.json(
@@ -87,7 +142,7 @@ export async function POST(request: Request) {
         { role: "system", content: systemPrompt },
         { role: "user", content: userPrompt },
       ],
-      top_p: Math.min(Math.max(creativity, 0.1), 1), // 0.1 to 1.0 based on slider
+      top_p: creativity, // 0.1 to 1.0 based on slider
       max_tokens: 800,
     });
 
