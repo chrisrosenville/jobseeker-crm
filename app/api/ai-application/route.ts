@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import OpenAI from "openai";
 import { z } from "zod";
 
@@ -9,8 +9,12 @@ import pdfParse from "pdf-parse/lib/pdf-parse.js";
 export const runtime = "nodejs";
 
 export async function POST(request: Request) {
-  const { userId } = await auth();
-  if (!userId) return new NextResponse("Unauthorized", { status: 401 });
+  const { isAuthenticated } = await auth();
+  if (!isAuthenticated)
+    return new NextResponse("Unauthorized", { status: 401 });
+
+  const user = await currentUser();
+  if (!user) return new NextResponse("Unauthorized", { status: 401 });
 
   try {
     const formData = await request.formData();
@@ -137,7 +141,7 @@ export async function POST(request: Request) {
     console.log("User Prompt:", userPrompt);
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "gpt-5-mini",
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: userPrompt },
