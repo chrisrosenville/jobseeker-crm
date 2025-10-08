@@ -9,46 +9,46 @@ datasource db {
 }
 
 model User {
-  id           String            @id // Clerk user ID
-  email        String?           @unique
-  createdAt    DateTime          @default(now())
-  updatedAt    DateTime          @updatedAt
-  applications JobApplication[]
+  id           String           @id
+  email        String?          @unique
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
   contacts     Contact[]
+  applications JobApplication[]
 }
 
 model JobApplication {
-  id          String     @id @default(cuid())
+  id          String    @id @default(cuid())
   title       String
   company     String
-  status      JobStatus  @default(APPLIED)
+  status      JobStatus @default(APPLIED)
   link        String?
   salary      Int?
-  dateApplied DateTime   @default(now())
+  dateApplied DateTime  @default(now())
   notes       String?
   userId      String
-  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
   contacts    Contact[]
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([userId], name: "idx_job_user")
+  @@index([userId], map: "idx_job_user")
 }
 
 model Contact {
-  id      String          @id @default(cuid())
-  name    String
-  email   String?
-  phone   String?
-  role    String?
-  jobId   String?
-  job     JobApplication? @relation(fields: [jobId], references: [id])
-  userId  String
-  user    User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
+  id        String          @id @default(cuid())
+  name      String
+  email     String?
+  phone     String?
+  role      String?
+  jobId     String?
+  userId    String
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  job       JobApplication? @relation(fields: [jobId], references: [id])
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([userId], name: "idx_contact_user")
+  @@index([userId], map: "idx_contact_user")
 }
 
 enum JobStatus {
