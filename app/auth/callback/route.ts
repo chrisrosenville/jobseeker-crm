@@ -1,26 +1,37 @@
 import { NextResponse } from "next/server";
-import { auth, clerkClient } from "@clerk/nextjs/server";
+import { currentUser, auth, clerkClient } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 
 export async function GET(request: Request) {
-  const { userId, sessionId } = await auth();
-  const clerkAuthClient = await clerkClient();
+  const { isAuthenticated, sessionId } = await auth();
+  if (!isAuthenticated) {
+    return new NextResponse("Unauthorized", { status: 401 });
+  }
+
+  const user = await currentUser();
+  if (!user) {
+    return new NextResponse("User not found", { status: 404 });
+  }
 
   const url = new URL(request.url);
 
-  if (!userId) {
+  if (!user.id) {
     url.pathname = "/auth/signin";
     return NextResponse.redirect(url);
   }
 
+  const clerkAuthClient = await clerkClient();
+
   try {
-    const user = await clerkAuthClient.users.getUser(userId);
     const email = user.emailAddresses?.[0]?.emailAddress ?? null;
+    if (!email) {
+      return new NextResponse("Email not found", { status: 404 });
+    }
 
     await prisma.user.upsert({
-      where: { id: userId },
+      where: { id: user.id },
       update: { email },
-      create: { id: userId, email },
+      create: { id: user.id, email },
     });
 
     url.pathname = "/dashboard";

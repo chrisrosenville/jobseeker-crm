@@ -1,3 +1,5 @@
+"use server";
+
 import { prisma } from "@/lib/prisma";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { BoardSection } from "@/components/dashboard/BoardSection";
@@ -11,7 +13,7 @@ export default async function DashboardHome() {
   if (!user) return <div>User not found</div>;
 
   const jobs = await prisma.jobApplication.findMany({
-    where: { userId: user?.id },
+    where: { userId: user.id },
     orderBy: { createdAt: "desc" },
   });
   const initialJobs: Job[] = jobs.map((j) => ({
