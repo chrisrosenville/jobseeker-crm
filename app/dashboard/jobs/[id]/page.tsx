@@ -43,7 +43,7 @@ async function updateNotesAction(formData: FormData) {
 export default async function JobDetails({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   const { userId } = await auth();
   if (!userId) return null;

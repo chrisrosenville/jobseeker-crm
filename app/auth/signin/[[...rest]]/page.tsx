@@ -1,11 +1,11 @@
 import { SignIn } from "@clerk/nextjs";
 
-export default function Page({
+export default async function Page({
   searchParams,
 }: {
-  searchParams: { error?: string };
+  searchParams: Promise<{ error?: string }>;
 }) {
-  const error = searchParams?.error;
+  const { error } = await searchParams;
 
   return (
     <div className="flex min-h-screen items-center justify-center p-4">

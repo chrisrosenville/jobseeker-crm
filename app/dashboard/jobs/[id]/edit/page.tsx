@@ -31,12 +31,13 @@ async function saveJobAction(formData: FormData) {
 export default async function EditJobPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   const { userId } = await auth();
   if (!userId) return null;
+  const { id } = await params;
   const job = await prisma.jobApplication.findFirst({
-    where: { id: params.id, userId },
+    where: { id, userId },
   });
   if (!job) return notFound();
 
