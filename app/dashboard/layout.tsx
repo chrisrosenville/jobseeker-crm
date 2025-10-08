@@ -4,6 +4,12 @@ import { LoadingScreen } from "@/components/LoadingScreen";
 import { DashboardPrefetcher } from "@/components/dashboard/DashboardPrefetcher";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Jobseeeker - Dashboard",
+  description: "Help you manage your job search",
+};
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   return (

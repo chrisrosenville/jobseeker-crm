@@ -59,7 +59,7 @@ export default async function Home() {
                 Job search chaos stops here
               </h3>
               <p className="mt-2 max-w-2xl mx-auto text-sm md:text-base text-white/90">
-                JobSeeker puts roles, stages, contacts, and notes in one clean
+                Jobseeeker puts roles, stages, contacts, and notes in one clean
                 flow—so you always know the status, the context, and the next
                 action to move each opportunity forward.
               </p>
@@ -82,17 +82,17 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Why use JobSeeker? */}
+      {/* Why use Jobseeeker? */}
       <section id="why" className="bg-background py-16">
         <div className="mx-auto max-w-6xl px-6">
           <div className="mx-auto mb-10 max-w-3xl text-center">
             <h2 className="text-2xl font-bold tracking-tight md:text-3xl">
-              Why use JobSeeker?
+              Why use Jobseeeker?
             </h2>
             <p className="text-muted-foreground mt-2">
               Tracking your job applications, what stage you are at, and who to
-              contact can be a lot of work. <br /> That is where JobSeeker comes
-              in.
+              contact can be a lot of work. <br /> That is where Jobseeeker
+              comes in.
             </p>
             <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-3">
               <div className="rounded-xl border bg-card p-6 shadow-sm">

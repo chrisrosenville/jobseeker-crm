@@ -9,13 +9,11 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-// import { ConfirmDelete } from "@/components/ConfirmDelete";
 import { DeleteJobButton } from "@/components/DeleteJobButton";
 import { JobStatusControl } from "@/components/JobStatusControl";
 import { Textarea } from "@/components/ui/textarea";
 import { AddContactDialog } from "@/components/modals/AddContactDialog";
 import { Badge } from "@/components/ui/badge";
-// import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ContactCard } from "@/components/contacts/ContactCard";
 import { JOB_STATUS_LABELS } from "@/lib/types";
 import {
@@ -25,8 +23,6 @@ import {
   CircleDollarSign,
   Clock,
 } from "lucide-react";
-
-// addContactAction removed (handled via dialog component)
 
 async function updateNotesAction(formData: FormData) {
   "use server";
@@ -68,8 +64,6 @@ export default async function JobDetails({
       : job.status === "OFFER"
       ? "bg-green-100 text-green-700"
       : "bg-red-100 text-red-700";
-
-  // initials helper moved into ContactListItem
 
   return (
     <div className="space-y-6">

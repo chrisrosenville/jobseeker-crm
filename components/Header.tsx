@@ -9,7 +9,7 @@ export default function Header() {
           href="/"
           className="flex items-center gap-2 text-base font-semibold"
         >
-          JobSeeker CRM
+          Jobseeeker
         </Link>
         <nav className="flex items-center gap-3 text-sm">
           {/* Theme Toggle */}

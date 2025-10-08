@@ -8,7 +8,7 @@ export default function Footer() {
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           <div className="col-span-1">
             <div className="flex items-center gap-2 text-base font-semibold">
-              JobSeeker CRM
+              Jobseeeker
             </div>
             <p className="text-muted-foreground mt-3 text-sm">
               A clean, focused workspace for managing your job search—from first
@@ -20,7 +20,7 @@ export default function Footer() {
             <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
               <li>
                 <Link href="#why" className="hover:underline">
-                  Why JobSeeker
+                  Why Jobseeeker
                 </Link>
               </li>
               <li>
@@ -67,9 +67,7 @@ export default function Footer() {
           </div>
         </div>
         <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t pt-6 text-sm text-muted-foreground sm:flex-row">
-          <p>
-            © {new Date().getFullYear()} JobSeeker CRM. All rights reserved.
-          </p>
+          <p>© {new Date().getFullYear()} Jobseeeker. All rights reserved.</p>
           <div className="flex items-center gap-4">
             <a href="#" className="hover:underline">
               Privacy
