@@ -1,14 +1,17 @@
 import { prisma } from "@/lib/prisma";
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { BoardSection } from "@/components/dashboard/BoardSection";
 import type { Job } from "@/lib/types";
 
 export default async function DashboardHome() {
-  const { userId } = await auth();
-  if (!userId) return null;
+  const { isAuthenticated } = await auth();
+  if (!isAuthenticated) return <div>Sign in to view your dashboard</div>;
+
+  const user = await currentUser();
+  if (!user) return <div>User not found</div>;
 
   const jobs = await prisma.jobApplication.findMany({
-    where: { userId },
+    where: { userId: user?.id },
     orderBy: { createdAt: "desc" },
   });
   const initialJobs: Job[] = jobs.map((j) => ({
