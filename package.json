@@ -10,7 +10,7 @@
     "prisma:generate": "prisma generate",
     "prisma:db:push": "prisma db push",
     "prisma:studio": "prisma studio",
-    "postinstall": "prisma generate"
+    "vercel-build": "prisma generate && prisma migrate deploy && next build"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.33.1",
