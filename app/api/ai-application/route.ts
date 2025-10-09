@@ -117,6 +117,7 @@ export async function POST(request: Request) {
 
     Guidelines:
     - Output language: ${language}.
+    - Creativity level from 0.1 to 1.0: ${creativity}.
     - Tone: ${tone}. Adjust the writing style accordingly:
       * Formal: Use formal language, avoid contractions, maintain professional distance
       * Professional: Balanced professional tone, some personality but still formal
@@ -146,8 +147,7 @@ export async function POST(request: Request) {
         { role: "system", content: systemPrompt },
         { role: "user", content: userPrompt },
       ],
-      top_p: creativity, // 0.1 to 1.0 based on slider
-      max_completion_tokens: 800,
+      max_completion_tokens: 1500,
     });
 
     const content =
