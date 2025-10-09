@@ -1,5 +1,13 @@
 import Link from "next/link";
 import { ThemeToggle } from "@/components/settings/ThemeToggle";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { User } from "lucide-react";
 
 export default function Header() {
   return (
@@ -15,19 +23,41 @@ export default function Header() {
           {/* Theme Toggle */}
           <ThemeToggle />
 
-          <div className="ml-2 hidden h-5 w-px bg-border sm:block" />
-          <Link
-            href="/auth/signin"
-            className="rounded-md px-3 py-1.5 text-sm font-medium hover:bg-accent hover:text-accent-foreground"
-          >
-            Sign in
-          </Link>
-          <Link
-            href="/auth/signup"
-            className="rounded-md bg-foreground px-3 py-1.5 text-sm font-medium text-background hover:bg-foreground/90"
-          >
-            Create account
-          </Link>
+          {/* Mobile/Tablet dropdown menu */}
+          <div className="sm:hidden">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" aria-label="User menu">
+                  <User className="h-5 w-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem asChild>
+                  <Link href="/auth/signin">Sign in</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/auth/signup">Create account</Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+
+          {/* Desktop buttons */}
+          <div className="hidden sm:flex items-center gap-3">
+            <div className="h-5 w-px bg-border" />
+            <Link
+              href="/auth/signin"
+              className="rounded-md px-3 py-1.5 text-sm font-medium hover:bg-accent hover:text-accent-foreground"
+            >
+              Sign in
+            </Link>
+            <Link
+              href="/auth/signup"
+              className="rounded-md bg-foreground px-3 py-1.5 text-sm font-medium text-background hover:bg-foreground/90"
+            >
+              Create account
+            </Link>
+          </div>
         </nav>
       </div>
     </header>

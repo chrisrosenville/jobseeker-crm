@@ -113,7 +113,7 @@ export async function POST(request: Request) {
 
     const systemPrompt = `
     You are an expert job application writer. 
-    Given a candidate's resume text, age, and an optional job post, craft a tailored job application/cover letter.
+    Given a candidate's resume text, age, tone, and an optional job post, craft a tailored job application/cover letter.
 
     Guidelines:
     - Output language: ${language}.
