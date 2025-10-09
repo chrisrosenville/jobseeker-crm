@@ -21,7 +21,7 @@ export async function POST(request: Request) {
     const resumeFile = formData.get("resume");
 
     const schema = z.object({
-      jobPost: z.string().max(10_000).optional().default(""),
+      jobPost: z.string().min(100).max(10_000).default(""),
       creativity: z
         .string()
         .transform((v) => Number(v))
@@ -161,9 +161,14 @@ export async function POST(request: Request) {
       max_completion_tokens: 5000,
     });
 
-    const content =
-      completion.choices?.[0]?.message?.content?.trim() ||
-      "Unable to generate application text.";
+    const content = completion.choices?.[0]?.message?.content?.trim();
+
+    if (!content || content.length < 100) {
+      return NextResponse.json(
+        { message: "Unable to generate application text." },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json({ content });
   } catch (err) {

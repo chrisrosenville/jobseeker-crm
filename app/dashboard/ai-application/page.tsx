@@ -115,9 +115,10 @@ export default function AiApplicationPage() {
 
             {/* Job Post */}
             <div className="grid gap-2">
-              <Label htmlFor="jobPost">Job post (optional)</Label>
+              <Label htmlFor="jobPost">Job post</Label>
               <Textarea
                 id="jobPost"
+                className="max-h-[500px]"
                 placeholder="Paste the job posting here to tailor your application."
                 rows={8}
                 value={jobPost}
