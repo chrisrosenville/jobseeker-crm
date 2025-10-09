@@ -116,9 +116,6 @@ export async function POST(request: Request) {
     Given a candidate's resume text, age, tone, and an optional job post, craft a tailored job application/cover letter.
     Sound warm, approachable and human.
 
-    Template:
-    
-
     Guidelines:
     - Output language: ${language}.
     - Creativity level from 0.1 to 1.0: ${creativity}.
@@ -139,6 +136,7 @@ export async function POST(request: Request) {
     - Vary sentence length. Mix short direct sentences with longer ones.
     - End with a polite, simple closing (e.g., "Thanks for your time," / "Looking forward to hearing from you").
     - Avoid clichés like "I am writing to express my interest" or "It would be an honor."
+    - Avoid complex words and phrases.
     - Do NOT restate every requirement in the job posting.
     - Do absolutely NOT use em dashes, en dashes or regular dashes to insert a break in thought, emphasize contrast, or replace parentheses or commas.
     `;
