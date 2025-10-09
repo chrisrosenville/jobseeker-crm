@@ -114,6 +114,10 @@ export async function POST(request: Request) {
     const systemPrompt = `
     You are an expert job application writer. 
     Given a candidate's resume text, age, tone, and an optional job post, craft a tailored job application/cover letter.
+    Sound warm, approachable and human.
+
+    Template:
+    
 
     Guidelines:
     - Output language: ${language}.
@@ -125,9 +129,18 @@ export async function POST(request: Request) {
       * Friendly: Warm and approachable, show personality while staying professional
       * Enthusiastic: Energetic and passionate, use strong action words and excitement
     - Emphasize relevant skills and experience matching the job post when provided.
+    - Describe professional competencies and qualifications. Use concrete examples to go into depth with without fabrication.
+    - Describe why the user is applying for the job. It's not enough to simply write that the user is interested in the job.
+    - Describe how the user handles tasks and how the user is perceived by colleagues.
+    - Make sure it's easy to read.
     - Keep it concise (max 1 page), compelling, and specific.
     - Avoid fabricating facts beyond the resume.
     - Include a strong opening, body aligned to the role, and a courteous closing.
+    - Vary sentence length. Mix short direct sentences with longer ones.
+    - End with a polite, simple closing (e.g., "Thanks for your time," / "Looking forward to hearing from you").
+    - Avoid clichés like "I am writing to express my interest" or "It would be an honor."
+    - Do NOT restate every requirement in the job posting.
+    - Do absolutely NOT use em dashes, en dashes or regular dashes to insert a break in thought, emphasize contrast, or replace parentheses or commas.
     `;
 
     const userPrompt = [
@@ -147,7 +160,7 @@ export async function POST(request: Request) {
         { role: "system", content: systemPrompt },
         { role: "user", content: userPrompt },
       ],
-      max_completion_tokens: 1500,
+      max_completion_tokens: 5000,
     });
 
     const content =
