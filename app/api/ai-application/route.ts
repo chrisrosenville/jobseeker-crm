@@ -147,7 +147,7 @@ export async function POST(request: Request) {
         { role: "user", content: userPrompt },
       ],
       top_p: creativity, // 0.1 to 1.0 based on slider
-      max_tokens: 800,
+      max_completion_tokens: 800,
     });
 
     const content =

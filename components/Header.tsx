@@ -1,4 +1,8 @@
 import Link from "next/link";
+import Image from "next/image";
+
+import { User } from "lucide-react";
+
 import { ThemeToggle } from "@/components/settings/ThemeToggle";
 import { Button } from "@/components/ui/button";
 import {
@@ -7,7 +11,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { User } from "lucide-react";
 
 export default function Header() {
   return (
@@ -15,8 +18,9 @@ export default function Header() {
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
         <Link
           href="/"
-          className="flex items-center gap-2 text-base font-semibold"
+          className="flex items-center gap-2 text-base font-semibold relative"
         >
+          {/* <Image src="/logo.png" alt="Jobseeeker" width={32} height={32} /> */}
           Jobseeeker
         </Link>
         <nav className="flex items-center gap-3 text-sm">
