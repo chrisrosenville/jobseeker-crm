@@ -8,7 +8,7 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Jobseeeker - Dashboard",
-  description: "Help you manage your job search",
+  description: "Track and manage your job applications",
 };
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {

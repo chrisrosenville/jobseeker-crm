@@ -1,8 +1,11 @@
-import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+
+import { currentUser } from "@clerk/nextjs/server";
+
 import { BadgeCheck } from "lucide-react";
+
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
@@ -15,39 +18,40 @@ export default async function Home() {
       <Header />
 
       {/* Hero */}
-      <section className="relative overflow-hidden py-20 sm:py-28">
-        {/* Backdrop accents */}
-        <div className="pointer-events-none absolute inset-0 -z-10">
-          <div className="absolute left-1/2 top-[-20%] h-[500px] w-[800px] -translate-x-1/2 rounded-full bg-gradient-to-br from-blue-200/60 via-indigo-200/40 to-transparent blur-3xl dark:from-blue-500/20 dark:via-indigo-500/10" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(0,0,0,0.06),transparent_60%)] dark:bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.06),transparent_60%)]" />
-        </div>
-        <div className="mx-auto max-w-6xl px-6 text-center">
-          <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-border bg-background/80 px-3 py-1 text-xs font-medium shadow-sm backdrop-blur">
-            <BadgeCheck className="h-3.5 w-3.5" />
-            Built for clarity and speed
-          </div>
-          <h1 className="mx-auto mt-4 max-w-4xl text-balance text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">
-            Stay organized and land your next role faster
-          </h1>
-          <p className="text-muted-foreground mx-auto mt-4 max-w-2xl text-base md:text-lg">
-            Manage applications on a Kanban board, keep notes, and never lose a
-            recruiter contact again.
-          </p>
-          <div className="mt-8 flex items-center justify-center gap-3">
-            <Link
-              href="/auth/signup"
-              className="rounded-xl bg-foreground px-5 py-2.5 text-sm font-medium text-background shadow-sm hover:bg-foreground/90"
-            >
-              Get started free
-            </Link>
-            <Link
-              href="#why"
-              className="rounded-xl border px-5 py-2.5 text-sm font-medium hover:bg-accent hover:text-accent-foreground"
-            >
-              Learn more
-            </Link>
+      <section className="relative mb-24 ">
+        <div className="relative py-20  sm:py-28 bg-gray-900">
+          <div className="w-full px-6 max-w-6xl mx-auto text-center">
+            <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-border bg-background px-3 py-1 text-xs font-medium shadow-sm backdrop-blur">
+              <BadgeCheck className="h-3.5 w-3.5" />
+              Built for clarity and speed
+            </div>
+            <h1 className="mx-auto mt-4 max-w-4xl text-balance text-gray-50 text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">
+              Stay organized and land your next role faster
+            </h1>
+            <p className="mx-auto mt-4 max-w-2xl text-gray-200 text-base md:text-lg">
+              Manage applications on a Kanban board, keep notes, and never lose
+              a recruiter contact again.
+            </p>
+            <div className="mt-8 flex items-center justify-center gap-3">
+              <Link
+                href="/auth/signup"
+                className="rounded-xl bg-neutral-950 px-5 py-2.5 border border-neutral-950 text-sm font-medium text-white shadow-sm hover:border-neutral-100"
+              >
+                Get started free
+              </Link>
+              <Link
+                href="#why"
+                className="rounded-xl border px-5 py-2.5 text-sm text-gray-200 font-medium dark:hover:bg-gray-100 dark:hover:text-gray-900 hover:bg-accent hover:text-accent-foreground"
+              >
+                Learn more
+              </Link>
+            </div>
           </div>
         </div>
+        <div
+          className="absolute -bottom-24 left-0 w-full h-24 bg-gray-900 transform-[rotate(180deg)]"
+          style={{ clipPath: "ellipse(60% 120% at 50% 120%)" }}
+        />
       </section>
 
       {/* Preview */}
@@ -60,8 +64,8 @@ export default async function Home() {
               </h3>
               <p className="mt-2 max-w-2xl mx-auto text-sm md:text-base text-white/90">
                 Jobseeeker puts roles, stages, contacts, and notes in one clean
-                flow—so you always know the status, the context, and the next
-                action to move each opportunity forward.
+                flow, so you always know the status, the context, and the next
+                action to move forward.
               </p>
               <div className="mt-4">
                 <Link
