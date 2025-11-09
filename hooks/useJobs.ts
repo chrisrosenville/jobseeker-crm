@@ -1,41 +1,121 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { JobApplication } from "@prisma/client";
+import { toast } from "sonner";
+
 import { api } from "@/lib/api";
-import { Job, JobStatus } from "@/lib/types";
+import {
+  queryKeys,
+  invalidationPatterns,
+  optimisticUpdates,
+} from "@/lib/queryUtils";
+import { CreateOrUpdateJobApplication, JobStatus } from "@/lib/types";
 
-type UseJobsOptions = { initialData?: Job[] };
+export function useJobApplications() {
+  return useQuery<JobApplication[]>({
+    queryKey: queryKeys.jobsApplications,
+    queryFn: () => api.get<JobApplication[]>("/api/jobs"),
+  });
+}
 
-export function useJobs(options?: UseJobsOptions) {
-  return useQuery<Job[]>({
-    queryKey: ["jobs"],
-    queryFn: () => api.get<Job[]>("/api/jobs"),
-    initialData: options?.initialData,
+export function useCreateJobApplication() {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (jobApplication: CreateOrUpdateJobApplication) => {
+      return api.post<JobApplication>("/api/jobs", jobApplication);
+    },
+    onSuccess: (newJobApplication) => {
+      optimisticUpdates.jobsApplications(qc, newJobApplication);
+      invalidationPatterns.jobsApplications(qc);
+      toast.success("Job application created successfully");
+    },
+    onError: (error) => {
+      console.error(error);
+      toast.error("Failed to create job application");
+    },
+  });
+}
+
+export function useUpdateJobApplication() {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (jobApplication: CreateOrUpdateJobApplication) => {
+      return api.patch<JobApplication>(
+        `/api/jobs/${jobApplication.id}`,
+        jobApplication
+      );
+    },
+    onSuccess: (jobApplication) => {
+      optimisticUpdates.jobsApplications(qc, jobApplication);
+      invalidationPatterns.jobsApplications(qc);
+      toast.success("Job application updated successfully");
+    },
+    onError: (error) => {
+      console.error(error);
+      toast.error("Failed to update job application");
+    },
   });
 }
 
 export function useUpdateJobStatus() {
   const qc = useQueryClient();
+
   return useMutation({
     mutationFn: async ({ id, status }: { id: string; status: JobStatus }) => {
-      return api.patch<Job>(`/api/jobs/${id}`, { status });
+      return api.patch<JobApplication>(`/api/jobs/${id}`, { status });
     },
     onMutate: async ({ id, status }) => {
-      await qc.cancelQueries({ queryKey: ["jobs"] });
-      const prev = qc.getQueryData<Job[]>(["jobs"]);
-      if (prev) {
-        qc.setQueryData<Job[]>(
-          ["jobs"],
-          prev.map((j) => (j.id === id ? { ...j, status } : j))
+      // Cancel any outgoing refetches
+      await qc.cancelQueries({ queryKey: queryKeys.jobsApplications });
+
+      // Snapshot the previous value
+      const previousJobs = qc.getQueryData<JobApplication[]>(
+        queryKeys.jobsApplications
+      );
+
+      // Optimistically update to the new status
+      if (previousJobs) {
+        qc.setQueryData<JobApplication[]>(
+          queryKeys.jobsApplications,
+          previousJobs.map((job) => (job.id === id ? { ...job, status } : job))
         );
       }
-      return { prev };
+
+      // Return context with the previous value
+      return { previousJobs };
     },
-    onError: (_err, _vars, ctx) => {
-      if (ctx?.prev) qc.setQueryData<Job[]>(["jobs"], ctx.prev);
+    onError: (error, variables, context) => {
+      // Rollback to previous value on error
+      if (context?.previousJobs) {
+        qc.setQueryData(queryKeys.jobsApplications, context.previousJobs);
+      }
+      console.error(error);
     },
-    onSettled: () => {
-      qc.invalidateQueries({ queryKey: ["jobs"] });
+    onSuccess: (updatedJob) => {
+      // Update with the actual response from the server
+      optimisticUpdates.jobsApplications(qc, updatedJob);
+      invalidationPatterns.jobsApplications(qc);
+    },
+  });
+}
+
+export function useDeleteJobApplication() {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      return api.delete<JobApplication>(`/api/jobs/${id}`);
+    },
+    onSuccess: () => {
+      invalidationPatterns.jobsApplications(qc);
+      toast.success("Job application deleted successfully");
+    },
+    onError: (error) => {
+      console.error(error);
+      toast.error("Failed to delete job application");
     },
   });
 }

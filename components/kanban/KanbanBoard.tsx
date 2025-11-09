@@ -10,53 +10,74 @@ import {
   DragOverlay,
 } from "@dnd-kit/core";
 import { useMemo, useState } from "react";
-import { JOB_STATUS_ORDER, Job, JobStatus } from "@/lib/types";
+import { JOB_STATUS_ORDER } from "@/lib/types";
 import { KanbanColumn } from "./KanbanColumn";
 import { useUpdateJobStatus } from "@/hooks/useJobs";
+import { JobApplication } from "@prisma/client";
 
-export function KanbanBoard({ jobs }: { jobs: Job[] }) {
-  const updateStatus = useUpdateJobStatus();
+export function KanbanBoard({
+  jobApplications,
+}: {
+  jobApplications: JobApplication[];
+}) {
+  const { mutateAsync: updateJobStatus } = useUpdateJobStatus();
   const [activeId, setActiveId] = useState<string | null>(null);
 
   const columns = useMemo(() => {
-    const map: Record<JobStatus, Job[]> = {
+    const map: Record<JobApplication["status"], JobApplication[]> = {
       APPLIED: [],
       INTERVIEW: [],
       OFFER: [],
       REJECTED: [],
     };
-    for (const job of jobs) {
+    for (const job of jobApplications) {
       map[job.status].push(job);
     }
     return map;
-  }, [jobs]);
+  }, [jobApplications]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } })
   );
 
   const handleDragStart = (event: DragStartEvent) => {
+    // Check if any dialog is currently open
+    const hasOpenDialog =
+      document.querySelector(
+        '[data-slot="dialog-content"][data-state="open"]'
+      ) !== null ||
+      document.querySelector(
+        '[data-slot="alert-dialog-content"][data-state="open"]'
+      ) !== null;
+
+    if (hasOpenDialog) {
+      // Cancel the drag if a dialog is open
+      return;
+    }
+
     setActiveId(event.active.id as string);
   };
 
-  const handleDragEnd = (event: DragEndEvent) => {
+  const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
     if (!over) return;
-    const targetStatus = over.id as JobStatus;
+
+    const targetStatus = over.id as JobApplication["status"];
     const id = active.id as string;
-    updateStatus.mutate({ id, status: targetStatus });
-    if (typeof window !== "undefined") {
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => setActiveId(null));
-      });
-    } else {
-      setActiveId(null);
+
+    const jobApplication = jobApplications.find((j) => j.id === id);
+    if (!jobApplication || !jobApplication.id) return;
+
+    // Only update if status actually changed
+    if (jobApplication.status !== targetStatus) {
+      await updateJobStatus({ id, status: targetStatus });
     }
+    setActiveId(null);
   };
 
   const activeJob = useMemo(
-    () => jobs.find((j) => j.id === activeId) ?? null,
-    [activeId, jobs]
+    () => jobApplications.find((j) => j.id === activeId) ?? null,
+    [activeId, jobApplications]
   );
 
   return (

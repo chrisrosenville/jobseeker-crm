@@ -2,6 +2,7 @@
 
 import { ConfirmDelete } from "@/components/ConfirmDelete";
 import { Button } from "@/components/ui/button";
+import { useDeleteJobApplication } from "@/hooks/useJobs";
 import { toast } from "sonner";
 
 export function DeleteJobButton({
@@ -11,17 +12,14 @@ export function DeleteJobButton({
   jobId: string;
   onDeleted?: () => void;
 }) {
+  const deleteJobApplication = useDeleteJobApplication();
+
   return (
     <ConfirmDelete
       title="Delete job"
       description="This will permanently remove this job and its contacts."
       onConfirm={async () => {
-        const res = await fetch(`/api/jobs/${jobId}`, { method: "DELETE" });
-        if (!res.ok) {
-          toast.error("Failed to delete job");
-          return;
-        }
-        toast.success("Job deleted");
+        await deleteJobApplication.mutateAsync(jobId);
         if (onDeleted) onDeleted();
         else window.location.href = "/dashboard";
       }}

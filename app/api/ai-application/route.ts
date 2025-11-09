@@ -92,6 +92,7 @@ export async function POST(request: Request) {
 
     const resumeBuffer = Buffer.from(await resumeFile.arrayBuffer());
     const resumeParsed = await pdfParse(resumeBuffer);
+
     type PdfParseResult = { text?: string };
     const pdfResult = resumeParsed as PdfParseResult;
     const resumeText = pdfResult.text?.trim().slice(0, 120_000) || "";
@@ -113,19 +114,20 @@ export async function POST(request: Request) {
 
     const systemPrompt = `
     You are an expert job application writer. 
-    Given a candidate's resume text, age, tone, and an optional job post, craft a tailored job application/cover letter.
+    Given a candidate's resume text, age, tone and job post, craft a tailored job application/cover letter.
     Sound warm, approachable and human.
 
-    Guidelines:
-    - Output language: ${language}.
-    - Creativity level from 0.1 to 1.0: ${creativity}.
-    - Tone: ${tone}. Adjust the writing style accordingly:
-      * Formal: Use formal language, avoid contractions, maintain professional distance
-      * Professional: Balanced professional tone, some personality but still formal
-      * Conversational: More natural, use contractions, friendly but professional
-      * Friendly: Warm and approachable, show personality while staying professional
-      * Enthusiastic: Energetic and passionate, use strong action words and excitement
-    - Emphasize relevant skills and experience matching the job post when provided.
+    Output language: ${language}. 
+    Creativity level from 0.00 to 1.00: ${creativity}.
+    Tone: ${tone}. Adjust the writing style accordingly:
+      * Formal: Use formal language, avoid contractions, maintain professional distance.
+      * Professional: Balanced professional tone, some personality but still formal.
+      * Conversational: More natural, use contractions, friendly but professional.
+      * Friendly: Warm and approachable, show personality while staying professional.
+      * Enthusiastic: Energetic and passionate, use strong action words and excitement.
+
+    DO:
+    - Emphasize relevant skills and experience matching the job post.
     - Describe professional competencies and qualifications. Use concrete examples to go into depth with without fabrication.
     - Describe why the user is applying for the job. It's not enough to simply write that the user is interested in the job.
     - Describe how the user handles tasks and how the user is perceived by colleagues.
@@ -135,10 +137,17 @@ export async function POST(request: Request) {
     - Include a strong opening, body aligned to the role, and a courteous closing.
     - Vary sentence length. Mix short direct sentences with longer ones.
     - End with a polite, simple closing (e.g., "Thanks for your time," / "Looking forward to hearing from you").
-    - Avoid clichés like "I am writing to express my interest" or "It would be an honor."
-    - Avoid complex words and phrases.
-    - Do NOT restate every requirement in the job posting.
-    - Do absolutely NOT use em dashes, en dashes or regular dashes to insert a break in thought, emphasize contrast, or replace parentheses or commas.
+
+    AVOID:
+    - A bad description of the professional match between the candidate and the job post.
+    - An unclear description of the applicant's motivation for the job.
+    - Lack of concrete examples of the applicant's competence.
+    - Clichés such as "I am writing to express my interest" or "It would be an honor."
+    - Complex words and phrases.
+
+    DO NOT:
+    - Restate every requirement in the job posting.
+    - Use em-dashes, en-dashes or regular dashes to insert a break in thought, emphasize contrast, or replace parentheses or commas.
     `;
 
     const userPrompt = [

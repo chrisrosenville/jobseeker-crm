@@ -1,17 +1,22 @@
 export type JobStatus = "APPLIED" | "INTERVIEW" | "OFFER" | "REJECTED";
 
-export type Job = {
-  id: string;
+export type CreateOrUpdateJobApplication = {
+  id?: string;
   title: string;
   company: string;
   status: JobStatus;
-  link?: string | null;
-  salary?: number | null;
-  dateApplied: string;
+  link?: URL | null;
+  salary?: string | null;
+  dateApplied: Date;
   notes?: string | null;
-  userId: string;
-  createdAt: string;
-  updatedAt: string;
+};
+
+export type CreateOrUpdateContact = {
+  jobId: string;
+  name: string;
+  email?: string | null;
+  phone?: string | null;
+  role?: string | null;
 };
 
 export const JOB_STATUS_ORDER: JobStatus[] = [

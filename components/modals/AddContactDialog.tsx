@@ -15,9 +15,11 @@ import { Label } from "@/components/ui/label";
 export function AddContactDialog({
   jobId,
   trigger,
+  onCreated,
 }: {
-  jobId: string;
+  jobId?: string;
   trigger?: React.ReactNode;
+  onCreated?: () => void;
 }) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -28,7 +30,7 @@ export function AddContactDialog({
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        jobId,
+        jobId: jobId || undefined,
         name: formData.get("name"),
         role: formData.get("role"),
         email: formData.get("email"),
@@ -37,13 +39,14 @@ export function AddContactDialog({
     });
     setLoading(false);
     setOpen(false);
-    if (typeof window !== "undefined") window.location.reload();
+    if (onCreated) onCreated();
+    else if (typeof window !== "undefined") window.location.reload();
   }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        {trigger ?? <Button size="sm">+ Add Contact</Button>}
+        {trigger ?? <Button>+ Add Contact</Button>}
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>

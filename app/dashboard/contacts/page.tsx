@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
-import { ContactCard } from "@/components/contacts/ContactCard";
+import { ContactListItem } from "@/components/contacts/ContactListItem";
+import { AddContactDialog } from "@/components/modals/AddContactDialog";
 
 export default async function ContactsPage() {
   const { userId } = await auth();
@@ -14,21 +15,24 @@ export default async function ContactsPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-semibold">Contacts</h1>
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-semibold">Contacts</h1>
+        <AddContactDialog />
+      </div>
+      <div className="space-y-3">
         {contacts.length === 0 ? (
-          <p className="text-sm text-gray-500">No contacts yet.</p>
+          <p className="text-sm text-muted-foreground">
+            You have not logged any contacts yet.
+          </p>
         ) : (
           contacts.map((c) => (
-            <ContactCard
+            <ContactListItem
               key={c.id}
               id={c.id}
               name={c.name}
               role={c.role}
               email={c.email}
               phone={c.phone}
-              company={c.job?.company}
-              jobTitle={c.job?.title}
             />
           ))
         )}

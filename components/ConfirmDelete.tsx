@@ -12,30 +12,37 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Loader2 } from "lucide-react";
 
 export function ConfirmDelete({
-  onConfirm,
-  children,
   title = "Delete",
   description = "This action cannot be undone.",
   open,
-  onOpenChange,
+  setOpen,
+  onConfirm,
+  children,
 }: {
-  onConfirm?: () => Promise<void> | void;
-  children?: React.ReactNode;
   title?: string;
   description?: string;
-  open?: boolean;
-  onOpenChange?: (open: boolean) => void;
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  onConfirm: () => Promise<void> | void;
+  children?: React.ReactNode;
 }) {
-  const [internalOpen, setInternalOpen] = useState(false);
-  const isControlled = typeof open === "boolean";
-  const isOpen = isControlled ? open : internalOpen;
-  const setOpen = isControlled && onOpenChange ? onOpenChange : setInternalOpen;
   const [loading, setLoading] = useState(false);
 
+  const handleSelect = async () => {
+    setLoading(true);
+
+    try {
+      await onConfirm();
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <AlertDialog open={isOpen} onOpenChange={setOpen}>
+    <AlertDialog open={open} onOpenChange={setOpen}>
       {children ? (
         <AlertDialogTrigger asChild>{children}</AlertDialogTrigger>
       ) : null}
@@ -46,18 +53,8 @@ export function ConfirmDelete({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel disabled={loading}>Cancel</AlertDialogCancel>
-          <AlertDialogAction
-            onClick={async () => {
-              try {
-                setLoading(true);
-                await onConfirm?.();
-              } finally {
-                setLoading(false);
-                setOpen(false);
-              }
-            }}
-          >
-            Confirm
+          <AlertDialogAction onClick={handleSelect}>
+            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Confirm"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

@@ -23,7 +23,7 @@ model JobApplication {
   company     String
   status      JobStatus @default(APPLIED)
   link        String?
-  salary      Int?
+  salary      String?
   dateApplied DateTime  @default(now())
   notes       String?
   userId      String

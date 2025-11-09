@@ -1,22 +1,21 @@
 "use client";
 
 import { useMemo } from "react";
-import { Job } from "@/lib/types";
 import { AddJobDialog } from "@/components/modals/AddJobDialog";
 import { KanbanBoard } from "@/components/kanban/KanbanBoard";
-import { useJobs } from "@/hooks/useJobs";
+import { useJobApplications } from "@/hooks/useJobs";
 
-export function BoardSection({ initialJobs }: { initialJobs: Job[] }) {
-  const { data: jobs = [] } = useJobs({ initialData: initialJobs });
+export function BoardSection() {
+  const { data: jobApplications = [] } = useJobApplications();
 
   const stats = useMemo(() => {
     return {
-      total: jobs.length,
-      applied: jobs.filter((j) => j.status === "APPLIED").length,
-      interview: jobs.filter((j) => j.status === "INTERVIEW").length,
-      offer: jobs.filter((j) => j.status === "OFFER").length,
+      total: jobApplications.length,
+      applied: jobApplications.filter((j) => j.status === "APPLIED").length,
+      interview: jobApplications.filter((j) => j.status === "INTERVIEW").length,
+      offer: jobApplications.filter((j) => j.status === "OFFER").length,
     };
-  }, [jobs]);
+  }, [jobApplications]);
 
   return (
     <div className="space-y-6">
@@ -30,7 +29,7 @@ export function BoardSection({ initialJobs }: { initialJobs: Job[] }) {
         </div>
         <AddJobDialog />
       </div>
-      <KanbanBoard jobs={jobs} />
+      <KanbanBoard jobApplications={jobApplications} />
     </div>
   );
 }

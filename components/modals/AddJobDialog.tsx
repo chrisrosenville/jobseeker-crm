@@ -13,36 +13,71 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
-export function AddJobDialog({ onCreated }: { onCreated?: () => void }) {
+import { CreateOrUpdateJobApplication } from "@/lib/types";
+import { useCreateJobApplication } from "@/hooks/useJobs";
+
+export function AddJobDialog() {
+  const [formData, setFormData] = useState<CreateOrUpdateJobApplication>({
+    title: "",
+    company: "",
+    status: "APPLIED",
+    link: null,
+    salary: null,
+    dateApplied: new Date(),
+    notes: null,
+  });
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<{ path: string[]; message: string }[]>(
+    []
+  );
+  const { mutateAsync: createJobApplication } = useCreateJobApplication();
 
-  async function onSubmit(formData: FormData) {
-    setLoading(true);
-    await fetch("/api/jobs", {
-      method: "POST",
-      body: JSON.stringify({
-        title: formData.get("title"),
-        company: formData.get("company"),
-        link: formData.get("link") || undefined,
-        dateApplied: formData.get("dateApplied") || undefined,
-        salary: formData.get("salary")
-          ? Number(formData.get("salary"))
-          : undefined,
-        notes: formData.get("notes") || undefined,
-      }),
-      headers: { "Content-Type": "application/json" },
+  const handleResetForm = () => {
+    setFormData({
+      title: "",
+      company: "",
+      status: "APPLIED",
+      link: null,
+      salary: null,
+      dateApplied: new Date(),
+      notes: null,
     });
+    setErrors([]);
     setLoading(false);
     setOpen(false);
-    if (onCreated) onCreated();
-    else if (typeof window !== "undefined") {
-      window.location.reload();
+  };
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  async function onSubmit() {
+    setLoading(true);
+    setErrors([]);
+
+    try {
+      await createJobApplication(formData);
+      setLoading(false);
+      setOpen(false);
+    } catch (error) {
+      console.error(error);
+      setErrors([{ path: ["unknown"], message: "Something went wrong" }]);
+      setLoading(false);
     }
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog
+      open={open}
+      onOpenChange={(isOpen) => {
+        setOpen(isOpen);
+        if (!isOpen) handleResetForm();
+      }}
+    >
       <DialogTrigger asChild>
         <Button>+ Add Job</Button>
       </DialogTrigger>
@@ -50,42 +85,126 @@ export function AddJobDialog({ onCreated }: { onCreated?: () => void }) {
         <DialogHeader>
           <DialogTitle>Add job application</DialogTitle>
         </DialogHeader>
-        <form action={(fd) => onSubmit(fd)} className="grid gap-3">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            onSubmit();
+          }}
+          className="grid gap-3"
+        >
           <div className="grid gap-1">
-            <Label htmlFor="title">Job title</Label>
+            <Label htmlFor="title">
+              Job title <span className="text-red-500">*</span>
+            </Label>
             <Input
               id="title"
               name="title"
               required
               placeholder="Frontend Engineer"
+              value={formData.title || ""}
+              onChange={handleChange}
             />
+            {errors.find((error) => error.path.includes("title")) && (
+              <p className="text-sm text-red-500">
+                {errors.find((error) => error.path.includes("title"))?.message}
+              </p>
+            )}
           </div>
+
           <div className="grid gap-1">
-            <Label htmlFor="company">Company</Label>
-            <Input id="company" name="company" required placeholder="Spotify" />
+            <Label htmlFor="company">
+              Company <span className="text-red-500">*</span>
+            </Label>
+            <Input
+              id="company"
+              name="company"
+              required
+              placeholder="Spotify"
+              value={formData.company || ""}
+              onChange={handleChange}
+            />
+            {errors.find((error) => error.path.includes("company")) && (
+              <p className="text-sm text-red-500">
+                {
+                  errors.find((error) => error.path.includes("company"))
+                    ?.message
+                }
+              </p>
+            )}
           </div>
+
           <div className="grid gap-1">
-            <Label htmlFor="link">Link</Label>
-            <Input id="link" name="link" placeholder="https://" />
+            <Label htmlFor="dateApplied">
+              Date applied <span className="text-red-500">*</span>
+            </Label>
+            <Input
+              id="dateApplied"
+              name="dateApplied"
+              type="date"
+              value={formData.dateApplied?.toISOString().split("T")[0]}
+              onChange={handleChange}
+              required
+            />
+            {errors.find((error) => error.path.includes("dateApplied")) && (
+              <p className="text-sm text-red-500">
+                {
+                  errors.find((error) => error.path.includes("dateApplied"))
+                    ?.message
+                }
+              </p>
+            )}
           </div>
+
           <div className="grid gap-1">
-            <Label htmlFor="dateApplied">Date applied</Label>
-            <Input id="dateApplied" name="dateApplied" type="date" />
+            <Label htmlFor="link">Job posting link</Label>
+            <Input
+              id="link"
+              name="link"
+              type="url"
+              placeholder="https://"
+              value={formData.link?.toString() ?? ""}
+              onChange={handleChange}
+            />
+            {errors.find((error) => error.path.includes("link")) && (
+              <p className="text-sm text-red-500">
+                {errors.find((error) => error.path.includes("link"))?.message}
+              </p>
+            )}
           </div>
+
           <div className="grid gap-1">
-            <Label htmlFor="salary">Salary</Label>
+            <Label htmlFor="salary">Requested salary</Label>
             <Input
               id="salary"
               name="salary"
-              type="number"
-              min="0"
-              placeholder="Optional"
+              type="text"
+              placeholder="35,000"
+              value={formData.salary ?? ""}
+              onChange={handleChange}
             />
+            {errors.find((error) => error.path.includes("salary")) && (
+              <p className="text-sm text-red-500">
+                {errors.find((error) => error.path.includes("salary"))?.message}
+              </p>
+            )}
           </div>
+
           <div className="grid gap-1">
             <Label htmlFor="notes">Notes</Label>
-            <Textarea id="notes" name="notes" placeholder="Referred by Sarah" />
+            <Textarea
+              id="notes"
+              name="notes"
+              placeholder="Referred by Sarah"
+              value={formData.notes || ""}
+              onChange={handleChange}
+            />
+            {errors.find((error) => error.path.includes("notes")) && (
+              <p className="text-sm text-red-500">
+                {errors.find((error) => error.path.includes("notes"))?.message}
+              </p>
+            )}
           </div>
+
           <div className="mt-2 flex justify-end gap-2">
             <Button
               type="button"

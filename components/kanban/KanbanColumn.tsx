@@ -1,7 +1,8 @@
 "use client";
 
 import { useDroppable } from "@dnd-kit/core";
-import { JOB_STATUS_LABELS, JobStatus, Job } from "@/lib/types";
+import { JOB_STATUS_LABELS, JobStatus } from "@/lib/types";
+import { JobApplication } from "@prisma/client";
 import { KanbanCard } from "./KanbanCard";
 
 export function KanbanColumn({
@@ -10,10 +11,11 @@ export function KanbanColumn({
   activeId,
 }: {
   status: JobStatus;
-  jobs: Job[];
+  jobs: JobApplication[];
   activeId?: string | null;
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: status });
+  const visibleJobs = jobs.filter((job) => job.id !== activeId);
 
   return (
     <div
@@ -35,20 +37,14 @@ export function KanbanColumn({
       >
         {JOB_STATUS_LABELS[status]}
         <span className="text-[10px] font-medium text-muted-foreground">
-          {jobs.length}
+          {visibleJobs.length}
         </span>
       </div>
       <div className="flex flex-1 flex-col gap-2 p-3">
-        {jobs.length === 0 ? (
+        {visibleJobs.length === 0 ? (
           <div className="text-xs text-muted-foreground">No items</div>
         ) : (
-          jobs.map((job) => (
-            <KanbanCard
-              key={job.id}
-              job={job}
-              isDraggingGhost={activeId === job.id}
-            />
-          ))
+          visibleJobs.map((job) => <KanbanCard key={job.id} job={job} />)
         )}
       </div>
     </div>

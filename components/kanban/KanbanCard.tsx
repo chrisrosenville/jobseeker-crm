@@ -3,25 +3,13 @@
 import { useDraggable } from "@dnd-kit/core";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { ConfirmDelete } from "@/components/ConfirmDelete";
-import { Job } from "@/lib/types";
-import { MoreVertical, Pencil, Trash2 } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { JobApplication } from "@prisma/client";
+import { KanbanCardOptions } from "./KanbanCardOptions";
 
 export function KanbanCard({
   job,
-  isDraggingGhost,
 }: {
-  job: Job;
-  isDraggingGhost?: boolean;
+  job: JobApplication;
 }) {
   const { attributes, listeners, setNodeRef, transform, isDragging } =
     useDraggable({ id: job.id });
@@ -33,13 +21,11 @@ export function KanbanCard({
       }
     : undefined;
 
-  const router = useRouter();
-
   return (
     <div
       ref={setNodeRef}
       style={style}
-      className={isDragging || isDraggingGhost ? "opacity-0" : undefined}
+      className={isDragging ? "opacity-0" : undefined}
     >
       <Card
         className="p-3 transition shadow-xs hover:shadow-sm hover:bg-accent/30 cursor-grab active:cursor-grabbing"
@@ -48,46 +34,18 @@ export function KanbanCard({
       >
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-start gap-2">
-            <Link href={`/dashboard/jobs/${job.id}`} className="block">
+            <Link 
+              href={`/dashboard/jobs/${job.id}`} 
+              className="block"
+              onPointerDown={(e) => e.stopPropagation()}
+            >
               <div className="text-sm font-medium leading-5">{job.title}</div>
               <div className="text-xs text-muted-foreground">{job.company}</div>
             </Link>
           </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                size="icon"
-                variant="ghost"
-                className="h-7 w-7"
-                aria-label="Actions"
-                onPointerDown={(e) => e.stopPropagation()}
-                onClick={(e) => e.stopPropagation()}
-              >
-                <MoreVertical className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-40">
-              <DropdownMenuItem
-                onClick={() => router.push(`/dashboard/jobs/${job.id}/edit`)}
-              >
-                <Pencil className="mr-2 h-4 w-4" /> Edit
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <ConfirmDelete
-                onConfirm={async () => {
-                  await fetch(`/api/jobs/${job.id}`, { method: "DELETE" });
-                  if (typeof window !== "undefined") window.location.reload();
-                }}
-              >
-                <DropdownMenuItem className="group cursor-pointer">
-                  <Trash2 className="mr-2 h-4 w-4 text-red-600 group-data-[highlighted]:text-red-700" />
-                  <span className="text-red-600 group-data-[highlighted]:text-red-700">
-                    Delete
-                  </span>
-                </DropdownMenuItem>
-              </ConfirmDelete>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div onPointerDown={(e) => e.stopPropagation()}>
+            <KanbanCardOptions job={job} />
+          </div>
         </div>
       </Card>
     </div>
