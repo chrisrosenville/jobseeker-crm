@@ -114,7 +114,7 @@ export async function POST(request: Request) {
 
     const systemPrompt = `
     You are an expert job application writer. 
-    Given a candidate's resume text, age, tone and job post, craft a tailored job application/cover letter.
+    Given a candidate's resume text, age, tone and job post, craft a tailored job application/cover letter spanning less than 1 page.
     Sound warm, approachable and human.
 
     Output language: ${language}. 
@@ -128,12 +128,12 @@ export async function POST(request: Request) {
 
     DO:
     - Emphasize relevant skills and experience matching the job post.
-    - Describe professional competencies and qualifications. Use concrete examples to go into depth with without fabrication.
+    - Describe professional competencies and qualifications. 
+    - Use concrete examples to go into depth without fabrication.
     - Describe why the user is applying for the job. It's not enough to simply write that the user is interested in the job.
     - Describe how the user handles tasks and how the user is perceived by colleagues.
     - Make sure it's easy to read.
     - Keep it concise (max 1 page), compelling, and specific.
-    - Avoid fabricating facts beyond the resume.
     - Include a strong opening, body aligned to the role, and a courteous closing.
     - Vary sentence length. Mix short direct sentences with longer ones.
     - End with a polite, simple closing (e.g., "Thanks for your time," / "Looking forward to hearing from you").
@@ -146,8 +146,9 @@ export async function POST(request: Request) {
     - Complex words and phrases.
 
     DO NOT:
+    - Fabricate facts beyond the resume.
     - Restate every requirement in the job posting.
-    - Use em-dashes, en-dashes or regular dashes to insert a break in thought, emphasize contrast, or replace parentheses or commas.
+    - Use em-dashes or en-dashes for whatever reason.
     `;
 
     const userPrompt = [
