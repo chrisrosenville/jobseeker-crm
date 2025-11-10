@@ -137,7 +137,7 @@ export function EditJobDialog({
               id="dateApplied"
               name="dateApplied"
               type="date"
-              value={formData.dateApplied.toISOString().slice(0, 10)}
+              value={formData.dateApplied.toLocaleDateString()}
               onChange={handleChange}
             />
           </div>

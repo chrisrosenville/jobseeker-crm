@@ -9,6 +9,7 @@ import {
   queryKeys,
   invalidationPatterns,
   optimisticUpdates,
+  globalCacheSettings,
 } from "@/lib/queryUtils";
 import { CreateOrUpdateJobApplication, JobStatus } from "@/lib/types";
 
@@ -16,6 +17,17 @@ export function useJobApplications() {
   return useQuery<JobApplication[]>({
     queryKey: queryKeys.jobsApplications,
     queryFn: () => api.get<JobApplication[]>("/api/jobs"),
+    ...globalCacheSettings.jobsApplications,
+  });
+}
+
+export function useJobApplication(id: string) {
+  return useQuery<JobApplication | undefined>({
+    queryKey: queryKeys.jobApplication(id),
+    queryFn: () => api.get<JobApplication>(`/api/jobs/${id}`),
+    enabled: !!id,
+    initialData: undefined,
+    ...globalCacheSettings.jobApplication,
   });
 }
 

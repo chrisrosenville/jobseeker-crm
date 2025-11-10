@@ -133,7 +133,7 @@ export function ContactCard({
       </CardContent>
       <ConfirmDelete
         open={deleteOpen}
-        onOpenChange={setDeleteOpen}
+        setOpen={setDeleteOpen}
         onConfirm={async () => {
           await fetch(`/api/contacts/${id}`, { method: "DELETE" });
           setDeleteOpen(false);

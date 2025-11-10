@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Contact } from "@prisma/client";
 
-import { CreateContact } from "@/lib/types";
+import { CreateOrUpdateContact } from "@/lib/types";
 import { api } from "@/lib/api";
 import {
   queryKeys,
@@ -23,7 +23,7 @@ export function useCreateContact() {
   const qc = useQueryClient();
 
   return useMutation({
-    mutationFn: async (contact: CreateContact) => {
+    mutationFn: async (contact: CreateOrUpdateContact) => {
       return api.post<Contact>("/api/contacts", contact);
     },
     onSuccess: (newContact) => {

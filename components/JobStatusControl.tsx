@@ -4,6 +4,8 @@ import { useState, useTransition } from "react";
 import { StatusSelect } from "@/components/StatusSelect";
 import { JobStatus } from "@/lib/types";
 import { toast } from "sonner";
+import { useUpdateJobStatus } from "@/hooks/useJobs";
+import { LoadingScreen } from "./LoadingScreen";
 
 export function JobStatusControl({
   jobId,
@@ -15,6 +17,12 @@ export function JobStatusControl({
   const [status, setStatus] = useState<JobStatus>(initialStatus);
   const [isPending, startTransition] = useTransition();
 
+  const { mutateAsync: updateJobStatus, isPending: isUpdatingStatus } =
+    useUpdateJobStatus();
+
+  const isLoading = isUpdatingStatus || isPending;
+  if (isLoading) return <LoadingScreen />;
+
   return (
     <div className="inline-flex items-center gap-2">
       <StatusSelect
@@ -22,18 +30,7 @@ export function JobStatusControl({
         onChange={(s) => {
           setStatus(s);
           startTransition(async () => {
-            const res = await fetch(`/api/jobs/${jobId}`, {
-              method: "PATCH",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ status: s }),
-            });
-            if (!res.ok) {
-              toast.error("Failed to update status");
-              // best-effort refetch on error
-              setStatus(initialStatus);
-            } else {
-              toast.success("Status updated");
-            }
+            await updateJobStatus({ id: jobId, status: s });
           });
         }}
       />

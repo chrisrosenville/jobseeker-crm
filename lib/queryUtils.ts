@@ -3,8 +3,31 @@ import { QueryClient } from "@tanstack/react-query";
 
 export const queryKeys = {
   jobsApplications: ["jobsApplications"],
+  jobApplication: (id: string) => ["jobApplication", id],
   contacts: ["contacts"],
   user: ["user"],
+};
+
+export const staleTime = Infinity;
+export const gcTime = Infinity;
+
+export const globalCacheSettings = {
+  jobsApplications: {
+    staleTime,
+    gcTime,
+  },
+  jobApplication: {
+    staleTime,
+    gcTime,
+  },
+  contacts: {
+    staleTime,
+    gcTime,
+  },
+  user: {
+    staleTime,
+    gcTime,
+  },
 };
 
 export const invalidationPatterns = {
@@ -22,14 +45,30 @@ export const optimisticUpdates = {
       queryKeys.jobsApplications,
       (old: JobApplication[] | undefined) => {
         if (!old) return [job];
+
         const existingIndex = old.findIndex((j) => j.id === job.id);
         if (existingIndex >= 0) {
-          // Replace existing job
           const updated = [...old];
           updated[existingIndex] = job;
           return updated;
         }
-        // Add new job
+
+        return [...old, job];
+      }
+    ),
+  jobsStatus: (queryClient: QueryClient, job: JobApplication) =>
+    queryClient.setQueryData(
+      queryKeys.jobsApplications,
+      (old: JobApplication[] | undefined) => {
+        if (!old) return [job];
+
+        const existingIndex = old.findIndex((j) => j.id === job.id);
+        if (existingIndex >= 0) {
+          const updated = [...old];
+          updated[existingIndex] = job;
+          return updated;
+        }
+
         return [...old, job];
       }
     ),

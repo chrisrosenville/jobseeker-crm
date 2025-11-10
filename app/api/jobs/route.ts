@@ -2,6 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { JobApplication } from "@prisma/client";
 
 const jobSchema = z.object({
   title: z
@@ -27,20 +28,13 @@ export async function GET() {
     orderBy: { createdAt: "desc" },
   });
 
-  const jobData = jobApplications.map((jobApplication) => ({
-    id: jobApplication.id,
-    title: jobApplication.title,
-    company: jobApplication.company,
-    link: jobApplication.link,
-    dateApplied: jobApplication.dateApplied,
-    salary: jobApplication.salary,
-    notes: jobApplication.notes,
-    status: jobApplication.status,
-    createdAt: jobApplication.createdAt,
-    updatedAt: jobApplication.updatedAt,
-  }));
+  const jobDataWithoutUserId: Omit<JobApplication, "userId">[] = [];
+  for (const job of jobApplications) {
+    const { userId: _, ...jobData } = job;
+    jobDataWithoutUserId.push(jobData);
+  }
 
-  return NextResponse.json(jobData);
+  return NextResponse.json(jobDataWithoutUserId);
 }
 
 export async function POST(request: Request) {
