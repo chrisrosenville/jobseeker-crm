@@ -31,12 +31,8 @@ export function BoardSection() {
         </div>
         <AddJobDialog />
       </div>
-      {jobApplications.length > 0 ? (
+      {jobApplications.length > 0 && (
         <KanbanBoard jobApplications={jobApplications} />
-      ) : (
-        <p className="text-muted-foreground mt-1 text-sm">
-          You have not logged any jobs yet.
-        </p>
       )}
     </div>
   );
