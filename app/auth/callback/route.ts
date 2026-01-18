@@ -60,7 +60,8 @@ export async function GET(request: Request) {
     url.pathname = "/dashboard";
     url.search = "";
     return NextResponse.redirect(url);
-  } catch (err) {
+  } catch (error) {
+    console.error("Callback error:", error);
     if (sessionId) {
       try {
         await clerkAuthClient.sessions.revokeSession(sessionId);

@@ -38,7 +38,7 @@ export default function Page() {
           <div className="flex items-start gap-3">
             <div className="flex-1">
               <p className="font-semibold">
-                We couldn't find an account connected to that social login.
+                We couldn&apos;t find an account connected to that social login.
               </p>
               <p className="mt-1">Would you like to create one instead?</p>
               <div className="mt-3 flex flex-wrap gap-2">

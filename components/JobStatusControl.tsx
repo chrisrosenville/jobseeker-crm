@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { StatusSelect } from "@/components/StatusSelect";
 import { JobStatus } from "@/lib/types";
-import { toast } from "sonner";
+
 import { useUpdateJobStatus } from "@/hooks/useJobs";
 import { LoadingScreen } from "./LoadingScreen";
 

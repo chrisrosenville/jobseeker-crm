@@ -15,22 +15,22 @@ interface FileUploadProps {
   className?: string;
 }
 
-export function FileUpload({
-  file,
+export function FileUpload({  file,
   onFileChange,
   accept = "application/pdf",
   maxSize = 10,
-  label = "Upload file",
+  label: _label = "Upload file",
   description,
   className,
 }: FileUploadProps) {
+  void _label;
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [isDragging, setIsDragging] = useState(false);
 
   const validateFile = (file: File): boolean => {
     if (accept && !file.type.match(accept.replace("*", ".*"))) {
       toast.error(
-        `Please upload a ${accept.split("/")[1].toUpperCase()} file.`
+        `Please upload a ${accept.split("/")[1].toUpperCase()} file.`,
       );
       return false;
     }
@@ -95,7 +95,10 @@ export function FileUpload({
             <Button
               type="button"
               variant="outline"
-              onClick={() => fileInputRef.current?.click()}
+              onClick={(e) => {
+                e.stopPropagation();
+                fileInputRef.current?.click();
+              }}
             >
               Choose file
             </Button>
@@ -119,7 +122,10 @@ export function FileUpload({
                 type="button"
                 variant="outline"
                 size="sm"
-                onClick={() => fileInputRef.current?.click()}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  fileInputRef.current?.click();
+                }}
               >
                 Replace
               </Button>
@@ -127,7 +133,8 @@ export function FileUpload({
                 type="button"
                 variant="ghost"
                 size="sm"
-                onClick={() => {
+                onClick={(e) => {
+                  e.stopPropagation();
                   onFileChange(null);
                   if (fileInputRef.current) fileInputRef.current.value = "";
                 }}
