@@ -30,7 +30,8 @@ export async function GET() {
 
   const jobDataWithoutUserId: Omit<JobApplication, "userId">[] = [];
   for (const job of jobApplications) {
-    const { userId: _, ...jobData } = job;
+    const { userId: _userId, ...jobData } = job;
+    void _userId;
     jobDataWithoutUserId.push(jobData);
   }
 
@@ -74,7 +75,10 @@ export async function POST(request: Request) {
     });
   }
 
-  const { userId: _, updatedAt, createdAt, ...jobData } = newJobApplication;
+  const { userId: _userId, updatedAt: _updatedAt, createdAt: _createdAt, ...jobData } = newJobApplication;
+  void _userId;
+  void _updatedAt;
+  void _createdAt;
 
   return NextResponse.json(jobData, { status: 201 });
 }

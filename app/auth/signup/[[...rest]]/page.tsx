@@ -12,7 +12,7 @@ export default function Page() {
         routing="path"
         path="/auth/signup"
         signInUrl="/auth/signin"
-        forceRedirectUrl="/auth/callback"
+        forceRedirectUrl="/auth/callback?intent=signup"
       />
     </div>
   );

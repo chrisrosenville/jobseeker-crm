@@ -18,7 +18,7 @@ export async function DELETE() {
   const clerkAuthClient = await clerkClient();
   try {
     await clerkAuthClient.users.deleteUser(userId);
-  } catch (e) {
+  } catch {
     // If Clerk deletion fails, we still return 200 since local data is gone
   }
 

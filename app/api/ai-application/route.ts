@@ -17,6 +17,103 @@ export async function POST(request: Request) {
   if (!user) return new NextResponse("Unauthorized", { status: 401 });
 
   try {
+    const contentType = request.headers.get("content-type");
+
+    // Check if this is a refinement request (JSON body)
+    if (contentType?.includes("application/json")) {
+      const body = await request.json();
+      const { mode, feedback, conversationHistory, language, tone } = body;
+
+      if (mode !== "refine") {
+        return NextResponse.json(
+          { message: "Invalid mode for JSON request" },
+          { status: 400 },
+        );
+      }
+
+      if (
+        !feedback ||
+        typeof feedback !== "string" ||
+        feedback.trim().length === 0
+      ) {
+        return NextResponse.json(
+          { message: "Feedback is required for refinement" },
+          { status: 400 },
+        );
+      }
+
+      if (
+        !Array.isArray(conversationHistory) ||
+        conversationHistory.length === 0
+      ) {
+        return NextResponse.json(
+          { message: "Conversation history is required for refinement" },
+          { status: 400 },
+        );
+      }
+
+      const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+      if (!openai.apiKey) {
+        return NextResponse.json(
+          { message: "OpenAI API key not configured" },
+          { status: 500 },
+        );
+      }
+
+      const systemPrompt = `
+You're refining a job application. Keep the person's voice—don't make it sound more corporate or robotic.
+
+Language: ${language || "en"}. Tone: ${tone || "professional"}.
+
+Apply the user's feedback precisely. If they ask for "more energy," add that. If they want "shorter," cut the fluff. But don't lose what makes this application sound like a real person.
+
+Don't add clichés, corporate jargon, or overly formal language unless that's specifically what they asked for.
+
+Keep it under 1 page. Make sure the edits feel natural, not like a template.
+      `;
+
+      const messages = [
+        { role: "system" as const, content: systemPrompt },
+        ...conversationHistory,
+        {
+          role: "user" as const,
+          content: `Please refine the application based on this feedback: ${feedback}`,
+        },
+      ];
+
+      const stream = await openai.chat.completions.create({
+        model: "gpt-5-mini",
+        messages,
+        max_completion_tokens: 5000,
+        stream: true,
+      });
+
+      const encoder = new TextEncoder();
+      const readable = new ReadableStream({
+        async start(controller) {
+          try {
+            for await (const chunk of stream) {
+              const content = chunk.choices[0]?.delta?.content || "";
+              if (content) {
+                controller.enqueue(encoder.encode(content));
+              }
+            }
+            controller.close();
+          } catch (error) {
+            controller.error(error);
+          }
+        },
+      });
+
+      return new Response(readable, {
+        headers: {
+          "Content-Type": "text/plain; charset=utf-8",
+          "Transfer-Encoding": "chunked",
+        },
+      });
+    }
+
+    // Original flow: FormData for initial generation
     const formData = await request.formData();
     const resumeFile = formData.get("resume");
 
@@ -43,7 +140,7 @@ export async function POST(request: Request) {
             "friendly",
             "enthusiastic",
           ])
-          .default("professional")
+          .default("professional"),
       ),
       language: z.preprocess(
         (v) => String(v ?? "").toLowerCase(),
@@ -62,7 +159,7 @@ export async function POST(request: Request) {
             "pl",
             "pt",
           ])
-          .default("en")
+          .default("en"),
       ),
     });
 
@@ -77,16 +174,16 @@ export async function POST(request: Request) {
     if (!parsed.success) {
       return NextResponse.json(
         { message: "Validation failed", errors: parsed.error.issues },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    const { jobPost, creativity, age, tone, language } = parsed.data;
+    const { jobPost, age, tone, language } = parsed.data;
 
     if (!resumeFile || !(resumeFile instanceof File)) {
       return NextResponse.json(
         { message: "Missing resume PDF upload" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -100,7 +197,7 @@ export async function POST(request: Request) {
     if (!resumeText) {
       return NextResponse.json(
         { message: "Could not extract text from the PDF" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -108,48 +205,36 @@ export async function POST(request: Request) {
     if (!openai.apiKey) {
       return NextResponse.json(
         { message: "OpenAI API key not configured" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
     const systemPrompt = `
-    You are an expert job application writer. 
-    Given a candidate's resume text, age, tone and job post, craft a tailored job application/cover letter spanning less than 1 page.
-    Sound warm, approachable and human.
+You're writing a job application for a ${age}-year-old professional. The hiring manager will read dozens of these—yours needs to feel genuinely human, not templated.
 
-    Output language: ${language}. 
-    Creativity level from 0.00 to 1.00: ${creativity}.
-    Tone: ${tone}. Adjust the writing style accordingly:
-      * Formal: Use formal language, avoid contractions, maintain professional distance.
-      * Professional: Balanced professional tone, some personality but still formal.
-      * Conversational: More natural, use contractions, friendly but professional.
-      * Friendly: Warm and approachable, show personality while staying professional.
-      * Enthusiastic: Energetic and passionate, use strong action words and excitement.
+Language: ${language}. Keep the tone ${tone === "formal" ? "professional and respectful" : tone === "professional" ? "confident but personable" : tone === "conversational" ? "natural and warm" : tone === "friendly" ? "warm and approachable" : "energetic and passionate"}.
 
-    DO:
-    - Emphasize relevant skills and experience matching the job post.
-    - Describe professional competencies and qualifications. 
-    - Use concrete examples to go into depth without fabrication.
-    - Describe why the user is applying for the job. It's not enough to simply write that the user is interested in the job.
-    - Describe how the user handles tasks and how the user is perceived by colleagues.
-    - Make sure it's easy to read.
-    - Keep it concise (max 1 page), compelling, and specific.
-    - Include a strong opening, body aligned to the role, and a courteous closing.
-    - Vary sentence length. Mix short direct sentences with longer ones.
-    - End with a polite, simple closing (e.g., "Thanks for your time," / "Looking forward to hearing from you").
+Here's what actually works:
 
-    AVOID:
-    - A bad description of the professional match between the candidate and the job post.
-    - An unclear description of the applicant's motivation for the job.
-    - Lack of concrete examples of the applicant's competence.
-    - Clichés such as "I am writing to express my interest" or "It would be an honor."
-    - Complex words and phrases.
+1. Start with real motivation. Not "I'm excited about this role." Instead: Why does this specific job matter to this person? What problem does it solve for them? What excites them about it?
 
-    DO NOT:
-    - Fabricate facts beyond the resume.
-    - Restate every requirement in the job posting.
-    - Use em-dashes or en-dashes for whatever reason.
-    `;
+2. Show, don't tell. Instead of listing "strong problem-solver," show them solving a real problem from the resume with specific context and outcome.
+
+3. Make the connection explicit. Which resume skills directly matter for this role? Help the hiring manager see the fit without spelling everything out.
+
+4. Sound like a real person. Use natural sentence variety. Include personality without being unprofessional. Contractions are fine. Avoid corporate buzzwords.
+
+5. Keep it concise and scannable. Less than 1 page. Make it easy to follow without a formal structure.
+
+What NOT to do:
+- Don't open with "I am writing to express my interest"
+- Don't fabricate skills or experience
+- Don't repeat every job requirement back
+- Don't sound generic—make it personal to this person and this role
+- Don't use em-dashes or en-dashes
+
+The goal: A hiring manager reads this and thinks "Okay, I get who this person is and why they care about this role."
+`;
 
     const userPrompt = [
       `Candidate age: ${age}`,
@@ -162,25 +247,39 @@ export async function POST(request: Request) {
     console.log("System Prompt:", systemPrompt);
     console.log("User Prompt:", userPrompt);
 
-    const completion = await openai.chat.completions.create({
+    const stream = await openai.chat.completions.create({
       model: "gpt-5-mini",
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: userPrompt },
       ],
       max_completion_tokens: 5000,
+      stream: true,
     });
 
-    const content = completion.choices?.[0]?.message?.content?.trim();
+    const encoder = new TextEncoder();
+    const readable = new ReadableStream({
+      async start(controller) {
+        try {
+          for await (const chunk of stream) {
+            const content = chunk.choices[0]?.delta?.content || "";
+            if (content) {
+              controller.enqueue(encoder.encode(content));
+            }
+          }
+          controller.close();
+        } catch (error) {
+          controller.error(error);
+        }
+      },
+    });
 
-    if (!content || content.length < 100) {
-      return NextResponse.json(
-        { message: "Unable to generate application text." },
-        { status: 500 }
-      );
-    }
-
-    return NextResponse.json({ content });
+    return new Response(readable, {
+      headers: {
+        "Content-Type": "text/plain; charset=utf-8",
+        "Transfer-Encoding": "chunked",
+      },
+    });
   } catch (err) {
     console.error(err);
     const message =

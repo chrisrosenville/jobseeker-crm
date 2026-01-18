@@ -4,14 +4,10 @@ import { useState } from "react";
 import { useParams } from "next/navigation";
 
 import {
-  Building2,
   CalendarDays,
-  Link as LinkIcon,
-  CircleDollarSign,
-  Clock,
 } from "lucide-react";
 
-import { JOB_STATUS_LABELS } from "@/lib/types";
+
 import { useJobApplication } from "@/hooks/useJobs";
 
 import {
@@ -25,8 +21,7 @@ import { Button } from "@/components/ui/button";
 import { JobStatusControl } from "@/components/JobStatusControl";
 import { Textarea } from "@/components/ui/textarea";
 import { AddContactDialog } from "@/components/modals/AddContactDialog";
-import { Badge } from "@/components/ui/badge";
-import { ContactCard } from "@/components/contacts/ContactCard";
+
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { KanbanCardOptions } from "@/components/kanban/KanbanCardOptions";
 
