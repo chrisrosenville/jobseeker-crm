@@ -6,6 +6,7 @@ import { Building2, Calendar, ExternalLink } from "lucide-react";
 import { JOB_STATUS_LABELS } from "@/lib/types";
 import { JobApplication } from "@prisma/client";
 import { KanbanCardOptions } from "../kanban/KanbanCardOptions";
+import { Card, CardContent } from "@/components/ui/card";
 
 export function JobListItem({ job }: { job: JobApplication }) {
   const getStatusColor = (status: JobApplication["status"]) => {
@@ -27,63 +28,73 @@ export function JobListItem({ job }: { job: JobApplication }) {
     return new Date(date).toISOString().split("T")[0];
   };
 
+  const getInitials = (company?: string | null) => {
+    if (!company) return "??";
+    return company
+      .split(" ")
+      .map((part) => part[0])
+      .slice(0, 2)
+      .join("")
+      .toUpperCase();
+  };
+
   return (
-    <div className="rounded border p-4 text-sm">
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex-1 min-w-0">
-          <div className="flex items-start gap-3 mb-2">
-            <div className="flex-1 min-w-0">
-              <Link
-                href={`/dashboard/jobs/${job.id}`}
-                className="block hover:underline"
-              >
-                <div className="font-medium text-base leading-tight mb-1">
+    <Card className="transition-shadow hover:shadow-sm p-2">
+      <CardContent className="p-3">
+        <div className="flex items-start gap-4">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg border bg-primary/5 text-xs font-semibold text-primary">
+            {getInitials(job.company)}
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex flex-wrap items-start justify-between gap-2">
+              <div className="min-w-0">
+                <Link
+                  href={`/dashboard/jobs/${job.id}`}
+                  className="block text-base font-semibold leading-tight hover:underline"
+                >
                   {job.title}
-                </div>
-                <div className="flex items-center gap-2 text-muted-foreground mb-2">
-                  <Building2 className="h-3.5 w-3.5 flex-shrink-0" />
+                </Link>
+                <div className="mt-1 flex items-center gap-2 text-sm text-muted-foreground pt-2">
+                  <Building2 className="h-4 w-4 flex-shrink-0" />
                   <span className="truncate">{job.company}</span>
                 </div>
-              </Link>
-              <div className="flex items-center gap-4 flex-wrap">
-                <Badge
-                  variant="outline"
-                  className={`text-xs ${getStatusColor(
-                    job.status as JobApplication["status"]
-                  )}`}
-                >
-                  {JOB_STATUS_LABELS[job.status as JobApplication["status"]]}
-                </Badge>
-                {job.dateApplied && (
-                  <div className="flex items-center gap-1.5 text-muted-foreground">
-                    <Calendar className="h-3.5 w-3.5" />
-                    <span className="text-xs">
-                      {formatDate(job.dateApplied as Date)}
-                    </span>
-                  </div>
-                )}
-                {job.salary && (
-                  <div className="flex items-center gap-1.5 text-muted-foreground">
-                    <span className="text-xs">{job.salary}</span>
-                  </div>
-                )}
-                {job.link && (
-                  <a
-                    href={job.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-1.5 text-primary hover:underline text-xs"
-                  >
-                    <ExternalLink className="h-3.5 w-3.5" />
-                    <span>View posting</span>
-                  </a>
-                )}
               </div>
+              <Badge
+                variant="outline"
+                className={`text-xs ${getStatusColor(
+                  job.status as JobApplication["status"],
+                )}`}
+              >
+                {JOB_STATUS_LABELS[job.status as JobApplication["status"]]}
+              </Badge>
+            </div>
+
+            <div className="mt-3 flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
+              {job.dateApplied && (
+                <div className="flex items-center gap-1.5">
+                  <Calendar className="h-3.5 w-3.5" />
+                  <span>{formatDate(job.dateApplied as Date)}</span>
+                </div>
+              )}
+              {job.salary && <span>{job.salary}</span>}
+              {job.link && (
+                <a
+                  href={job.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 text-primary hover:underline"
+                >
+                  <ExternalLink className="h-3.5 w-3.5" />
+                  <span>View posting</span>
+                </a>
+              )}
             </div>
           </div>
+          <div className="shrink-0">
+            <KanbanCardOptions job={job} />
+          </div>
         </div>
-        <KanbanCardOptions job={job} />
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }
