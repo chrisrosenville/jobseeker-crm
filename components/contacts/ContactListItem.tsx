@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ConfirmDelete } from "@/components/ConfirmDelete";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,8 +11,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreVertical, Pencil, Trash2 } from "lucide-react";
+import { MoreVertical, Pencil, Trash2, Mail, Phone } from "lucide-react";
 import { EditContactDialog } from "@/components/modals/EditContactDialog";
+import { Card, CardContent } from "@/components/ui/card";
 
 function getInitials(name: string) {
   const parts = name.trim().split(/\s+/);
@@ -40,50 +40,81 @@ export function ContactListItem({
   const [deleteOpen, setDeleteOpen] = useState(false);
 
   return (
-    <div className="rounded border p-3 text-sm">
-      <div className="flex items-start justify-between gap-3">
+    <Card className="transition-shadow hover:shadow-sm p-2">
+      <CardContent className="p-3">
         <div className="flex items-start gap-3">
-          <Avatar>
-            <AvatarFallback>{getInitials(name)}</AvatarFallback>
-          </Avatar>
-          <div>
-            <div className="font-medium">{name}</div>
-            <div className="text-muted-foreground">{role || "Contact"}</div>
-            {email && <div className="mt-1">{email}</div>}
-            {phone && <div>{phone}</div>}
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg border bg-primary/5 text-xs font-semibold text-primary">
+            {getInitials(name)}
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex flex-wrap items-start justify-between gap-2">
+              <div className="min-w-0">
+                <div className="text-sm font-semibold leading-tight">
+                  {name}
+                </div>
+                {role && (
+                  <div className="mt-1 text-xs text-muted-foreground">
+                    {role}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+              {email && (
+                <a
+                  href={`mailto:${email}`}
+                  className="flex items-center gap-1.5 text-primary hover:underline"
+                >
+                  <Mail className="h-3.5 w-3.5" />
+                  <span>{email}</span>
+                </a>
+              )}
+              {phone && (
+                <a
+                  href={`tel:${phone}`}
+                  className="flex items-center gap-1.5 text-primary hover:underline"
+                >
+                  <Phone className="h-3.5 w-3.5" />
+                  <span>{phone}</span>
+                </a>
+              )}
+            </div>
+          </div>
+          <div className="shrink-0">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button size="icon" variant="ghost" className="h-7 w-7">
+                  <MoreVertical className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-40">
+                <DropdownMenuItem
+                  onSelect={(e) => {
+                    e.preventDefault();
+                    setEditOpen(true);
+                  }}
+                  className="cursor-pointer"
+                >
+                  <Pencil className="mr-2 h-4 w-4" /> Edit
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onSelect={(e) => {
+                    e.preventDefault();
+                    setDeleteOpen(true);
+                  }}
+                  className="group cursor-pointer"
+                >
+                  <Trash2 className="mr-2 h-4 w-4 text-red-600 group-data-[highlighted]:text-red-700" />
+                  <span className="text-red-600 group-data-[highlighted]:text-red-700">
+                    Delete
+                  </span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button size="icon" variant="ghost" className="h-7 w-7">
-              <MoreVertical className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-40">
-            <DropdownMenuItem
-              onSelect={(e) => {
-                e.preventDefault();
-                setEditOpen(true);
-              }}
-              className="cursor-pointer"
-            >
-              <Pencil className="mr-2 h-4 w-4" /> Edit
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onSelect={(e) => {
-                e.preventDefault();
-                setDeleteOpen(true);
-              }}
-              className="group cursor-pointer"
-            >
-              <Trash2 className="mr-2 h-4 w-4 text-red-600 group-data-[highlighted]:text-red-700" />
-              <span className="text-red-600 group-data-[highlighted]:text-red-700">
-                Delete
-              </span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
         <EditContactDialog
           contact={{
             id,
@@ -105,7 +136,7 @@ export function ContactListItem({
             router.refresh();
           }}
         />
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }

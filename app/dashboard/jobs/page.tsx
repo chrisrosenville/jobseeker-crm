@@ -4,13 +4,7 @@ import { JobListItem } from "@/components/jobs/JobListItem";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { AddJobDialog } from "@/components/modals/AddJobDialog";
 import { useJobApplications } from "@/hooks/useJobs";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { BriefcaseBusiness, Search, SlidersHorizontal, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
@@ -26,32 +20,17 @@ import { JOB_STATUS_LABELS, JobStatus } from "@/lib/types";
 import { useMemo, useState } from "react";
 
 export default function JobsPage() {
-  const JobApplications = useJobApplications();
+  const { data = [], isLoading: isLoadingJobApplications } =
+    useJobApplications();
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<"ALL" | JobStatus>("ALL");
   const [sortBy, setSortBy] = useState<"recent" | "company" | "title">(
     "recent",
   );
 
-  if (JobApplications.isLoading) return <LoadingScreen />;
-
-  const jobApplications = JobApplications.data ?? [];
-  const statusCounts = jobApplications.reduce(
-    (acc, job) => {
-      acc[job.status] += 1;
-      return acc;
-    },
-    {
-      APPLIED: 0,
-      INTERVIEW: 0,
-      OFFER: 0,
-      REJECTED: 0,
-    },
-  );
-
   const filteredJobs = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
-    let filtered = jobApplications;
+    let filtered = data;
 
     if (statusFilter !== "ALL") {
       filtered = filtered.filter((job) => job.status === statusFilter);
@@ -86,7 +65,22 @@ export default function JobsPage() {
     });
 
     return sorted;
-  }, [jobApplications, query, sortBy, statusFilter]);
+  }, [data, query, sortBy, statusFilter]);
+
+  if (isLoadingJobApplications) return <LoadingScreen />;
+
+  const statusCounts = data.reduce(
+    (acc, job) => {
+      acc[job.status] += 1;
+      return acc;
+    },
+    {
+      APPLIED: 0,
+      INTERVIEW: 0,
+      OFFER: 0,
+      REJECTED: 0,
+    },
+  );
 
   const hasFilters =
     query.trim().length > 0 || statusFilter !== "ALL" || sortBy !== "recent";
@@ -111,8 +105,8 @@ export default function JobsPage() {
 
       <Card>
         <CardHeader className="space-y-4">
-          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-            <div className="relative w-full lg:max-w-md">
+          <div className="flex flex-col gap-3">
+            <div className="relative w-full max-w-xl">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 value={query}
@@ -182,7 +176,7 @@ export default function JobsPage() {
               {
                 key: "ALL" as const,
                 label: "All",
-                count: jobApplications.length,
+                count: data.length,
               },
               {
                 key: "APPLIED" as const,
@@ -227,10 +221,10 @@ export default function JobsPage() {
         <CardContent className="space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-muted-foreground">
             <span>
-              Showing {filteredJobs.length} of {jobApplications.length} jobs
+              Showing {filteredJobs.length} of {data.length} jobs
             </span>
           </div>
-          {jobApplications.length === 0 ? (
+          {data.length === 0 ? (
             <div className="rounded-xl border border-dashed bg-muted/30 p-6 text-center">
               <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-background shadow-sm">
                 <BriefcaseBusiness className="h-5 w-5 text-muted-foreground" />
