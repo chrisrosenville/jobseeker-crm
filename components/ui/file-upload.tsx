@@ -15,7 +15,8 @@ interface FileUploadProps {
   className?: string;
 }
 
-export function FileUpload({  file,
+export function FileUpload({
+  file,
   onFileChange,
   accept = "application/pdf",
   maxSize = 10,

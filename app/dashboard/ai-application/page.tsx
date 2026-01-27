@@ -50,7 +50,7 @@ export default function AiApplicationPage() {
   const [tone, setTone] = useState<string>("professional");
   const [loading, setLoading] = useState(false);
   const [jobPost, setJobPost] = useState("");
-  const [feedback, setFeedback] = useState("");  
+  const [feedback, setFeedback] = useState("");
   const [conversationHistory, setConversationHistory] = useState<
     Array<{ role: "user" | "assistant"; content: string; timestamp: Date }>
   >([]);
@@ -58,7 +58,7 @@ export default function AiApplicationPage() {
   const [streamingContent, setStreamingContent] = useState("");
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
   const [inputExpanded, setInputExpanded] = useState(true);
-  
+
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -82,7 +82,9 @@ export default function AiApplicationPage() {
   }, [conversationHistory]);
 
   const wordCount = useMemo(() => {
-    return applicationText.trim() ? applicationText.trim().split(/\s+/).length : 0;
+    return applicationText.trim()
+      ? applicationText.trim().split(/\s+/).length
+      : 0;
   }, [applicationText]);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -153,11 +155,8 @@ export default function AiApplicationPage() {
       toast.error(message);
     } finally {
       setLoading(false);
-      
     }
   }
-  
-  
 
   async function handleRefine() {
     if (!feedback.trim()) {
@@ -284,7 +283,9 @@ export default function AiApplicationPage() {
         </CardHeader>
 
         <CardContent>
-          <div className={`overflow-hidden transition-all duration-300 ${inputExpanded ? "max-h-[1200px] opacity-100" : "max-h-0 opacity-0"}`}>
+          <div
+            className={`overflow-hidden transition-all duration-300 ${inputExpanded ? "max-h-[1200px] opacity-100" : "max-h-0 opacity-0"}`}
+          >
             <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-6">
               {/* Resume */}
               <div className="grid gap-2">
@@ -414,152 +415,155 @@ export default function AiApplicationPage() {
 
       {/* Chat Conversation Card (always visible) */}
       <Card>
-          <CardHeader>
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <CardTitle>Conversation</CardTitle>
-                {applicationText && (
-                  <CardDescription className="mt-1">
-                    {wordCount} words • {applicationText.length} characters
-                  </CardDescription>
-                )}
-              </div>
-              <Button
-                type="button"
-                variant="destructive"
-                size="sm"
-                disabled={loading}
-                onClick={() => setShowStartOverDialog(true)}
-                className="btn-destructive-hover"
-              >
-                Start over
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="max-h-[60vh] sm:max-h-[600px] overflow-y-auto space-y-4 sm:space-y-6 px-1 sm:px-0">
-              {conversationHistory.length === 0 && !loading && (
-                <div className="flex items-center justify-center py-12 text-center">
-                  <div className="max-w-md space-y-3">
-                    <p className="text-sm text-muted-foreground">
-                      Fill in the form above and click <strong>Generate application</strong> to create your first draft.
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      Once generated, you can refine it using the quick suggestions or custom feedback below.
-                    </p>
-                  </div>
-                </div>
+        <CardHeader>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <CardTitle>Conversation</CardTitle>
+              {applicationText && (
+                <CardDescription className="mt-1">
+                  {wordCount} words • {applicationText.length} characters
+                </CardDescription>
               )}
-              {conversationHistory.map((message, index) => (
+            </div>
+            <Button
+              type="button"
+              variant="destructive"
+              size="sm"
+              disabled={loading}
+              onClick={() => setShowStartOverDialog(true)}
+              className="btn-destructive-hover"
+            >
+              Start over
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="max-h-[60vh] sm:max-h-[600px] overflow-y-auto space-y-4 sm:space-y-6 px-1 sm:px-0">
+            {conversationHistory.length === 0 && !loading && (
+              <div className="flex items-center justify-center py-12 text-center">
+                <div className="max-w-md space-y-3">
+                  <p className="text-sm text-muted-foreground">
+                    Fill in the form above and click{" "}
+                    <strong>Generate application</strong> to create your first
+                    draft.
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Once generated, you can refine it using the quick
+                    suggestions or custom feedback below.
+                  </p>
+                </div>
+              </div>
+            )}
+            {conversationHistory.map((message, index) => (
+              <div
+                key={index}
+                className={[
+                  "flex gap-3 mb-4",
+                  message.role === "user" ? "justify-end" : "justify-start",
+                ].join(" ")}
+              >
+                {message.role === "assistant" && (
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                    <Bot className="h-4 w-4" />
+                  </div>
+                )}
                 <div
-                  key={index}
                   className={[
-                    "flex gap-3 mb-4",
-                    message.role === "user" ? "justify-end" : "justify-start",
+                    "group relative w-full sm:max-w-[80%] rounded-lg px-3 py-2 sm:px-4 sm:py-3",
+                    message.role === "user"
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-card border",
                   ].join(" ")}
                 >
-                  {message.role === "assistant" && (
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                      <Bot className="h-4 w-4" />
-                    </div>
-                  )}
-                  <div
-                    className={[
-                      "group relative w-full sm:max-w-[80%] rounded-lg px-3 py-2 sm:px-4 sm:py-3",
-                      message.role === "user"
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-card border",
-                    ].join(" ")}
-                  >
-                    <div className="whitespace-pre-wrap break-words text-sm">
-                      {message.content}
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => handleCopyMessage(message.content, index)}
-                      className="absolute right-2 top-2 opacity-0 transition-opacity group-hover:opacity-100"
-                      aria-label="Copy message"
-                    >
-                      {copiedIndex === index ? (
-                        <Check className="h-3.5 w-3.5 text-green-600" />
-                      ) : (
-                        <Copy className="h-3.5 w-3.5" />
-                      )}
-                    </button>
+                  <div className="whitespace-pre-wrap break-words text-sm">
+                    {message.content}
                   </div>
-                  {message.role === "user" && (
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
-                      <User className="h-4 w-4" />
-                    </div>
-                  )}
-                </div>
-              ))}
-              {loading && !streamingContent && (
-                <div className="flex gap-3 justify-start">
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                    <Bot className="h-4 w-4" />
-                  </div>
-                  <div className="w-full sm:max-w-[80%] rounded-lg border bg-card px-3 py-2 sm:px-4 sm:py-3">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      <span>Generating response…</span>
-                    </div>
-                  </div>
-                </div>
-              )}
-              {streamingContent && (
-                <div className="flex gap-3 justify-start">
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                    <Bot className="h-4 w-4" />
-                  </div>
-                  <div className="w-full sm:max-w-[80%] rounded-lg border bg-card px-3 py-2 sm:px-4 sm:py-3">
-                    <div className="whitespace-pre-wrap break-words text-sm">
-                      {streamingContent}
-                    </div>
-                  </div>
-                </div>
-              )}
-              <div ref={chatEndRef} />
-            </div>
-
-            <div className="mt-4 space-y-3">
-              <div className="flex flex-wrap gap-2">
-                {QUICK_SUGGESTIONS.map((s) => (
-                  <Button
-                    key={s}
+                  <button
                     type="button"
-                    variant="outline"
-                    size="sm"
-                    disabled={loading || !hasConversation}
-                    onClick={() => {
-                      setFeedback(s);
-                      setTimeout(() => handleRefine(), 0);
-                    }}
+                    onClick={() => handleCopyMessage(message.content, index)}
+                    className="absolute right-2 top-2 opacity-0 transition-opacity group-hover:opacity-100"
+                    aria-label="Copy message"
                   >
-                    {s}
-                  </Button>
-                ))}
+                    {copiedIndex === index ? (
+                      <Check className="h-3.5 w-3.5 text-green-600" />
+                    ) : (
+                      <Copy className="h-3.5 w-3.5" />
+                    )}
+                  </button>
+                </div>
+                {message.role === "user" && (
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
+                    <User className="h-4 w-4" />
+                  </div>
+                )}
               </div>
-              <Label htmlFor="feedback">Refine your application</Label>
-              <Textarea
-                id="feedback"
-                placeholder="Ask for changes (e.g., 'Make it more enthusiastic', 'Add more details about my Python experience', 'Shorten the introduction')..."
-                value={feedback}
-                onChange={(e) => setFeedback(e.target.value)}
-                rows={3}
-                disabled={loading || !hasConversation}
-              />
-              <Button
-                type="button"
-                onClick={handleRefine}
-                disabled={loading || !hasConversation || !feedback.trim()}
-                className="w-full sm:w-auto"
-              >
-                {loading ? "Refining…" : "Send"}
-              </Button>
+            ))}
+            {loading && !streamingContent && (
+              <div className="flex gap-3 justify-start">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                  <Bot className="h-4 w-4" />
+                </div>
+                <div className="w-full sm:max-w-[80%] rounded-lg border bg-card px-3 py-2 sm:px-4 sm:py-3">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span>Generating response…</span>
+                  </div>
+                </div>
+              </div>
+            )}
+            {streamingContent && (
+              <div className="flex gap-3 justify-start">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                  <Bot className="h-4 w-4" />
+                </div>
+                <div className="w-full sm:max-w-[80%] rounded-lg border bg-card px-3 py-2 sm:px-4 sm:py-3">
+                  <div className="whitespace-pre-wrap break-words text-sm">
+                    {streamingContent}
+                  </div>
+                </div>
+              </div>
+            )}
+            <div ref={chatEndRef} />
+          </div>
+
+          <div className="mt-4 space-y-3">
+            <div className="flex flex-wrap gap-2">
+              {QUICK_SUGGESTIONS.map((s) => (
+                <Button
+                  key={s}
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={loading || !hasConversation}
+                  onClick={() => {
+                    setFeedback(s);
+                    setTimeout(() => handleRefine(), 0);
+                  }}
+                >
+                  {s}
+                </Button>
+              ))}
             </div>
-          </CardContent>
-        </Card>
+            <Label htmlFor="feedback">Refine your application</Label>
+            <Textarea
+              id="feedback"
+              placeholder="Ask for changes (e.g., 'Make it more enthusiastic', 'Add more details about my Python experience', 'Shorten the introduction')..."
+              value={feedback}
+              onChange={(e) => setFeedback(e.target.value)}
+              rows={3}
+              disabled={loading || !hasConversation}
+            />
+            <Button
+              type="button"
+              onClick={handleRefine}
+              disabled={loading || !hasConversation || !feedback.trim()}
+              className="w-full sm:w-auto"
+            >
+              {loading ? "Refining…" : "Send"}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
       <AlertDialog
         open={showStartOverDialog}

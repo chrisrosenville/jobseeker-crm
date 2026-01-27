@@ -52,7 +52,7 @@ export async function POST(request: Request) {
           message: issue.message,
         })),
       }),
-      { status: 400 }
+      { status: 400 },
     );
   }
   const { title, company, link, dateApplied, salary, notes } = parsed.data;
@@ -75,7 +75,12 @@ export async function POST(request: Request) {
     });
   }
 
-  const { userId: _userId, updatedAt: _updatedAt, createdAt: _createdAt, ...jobData } = newJobApplication;
+  const {
+    userId: _userId,
+    updatedAt: _updatedAt,
+    createdAt: _createdAt,
+    ...jobData
+  } = newJobApplication;
   void _userId;
   void _updatedAt;
   void _createdAt;
