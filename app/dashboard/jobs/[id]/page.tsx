@@ -3,10 +3,7 @@
 import { useState } from "react";
 import { useParams } from "next/navigation";
 
-import {
-  CalendarDays,
-} from "lucide-react";
-
+import { CalendarDays } from "lucide-react";
 
 import { useJobApplication } from "@/hooks/useJobs";
 
