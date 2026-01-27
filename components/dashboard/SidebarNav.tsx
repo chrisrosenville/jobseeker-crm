@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SheetClose } from "@/components/ui/sheet";
+import { cn } from "@/lib/utils";
 
 export const navigationItems = [
   { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
@@ -20,10 +21,37 @@ export const navigationItems = [
   { href: "/dashboard/settings", icon: Settings, label: "Settings" },
 ];
 
-function NavLink({ href, children }: { href: string; children: ReactNode }) {
+function NavLink({
+  href,
+  children,
+  label,
+  collapsed,
+}: {
+  href: string;
+  children: ReactNode;
+  label: string;
+  collapsed: boolean;
+}) {
   return (
-    <Button asChild variant="ghost" className="justify-start w-full">
-      <Link href={href} prefetch>
+    <Button
+      asChild
+      variant="ghost"
+      size={collapsed ? "icon" : "default"}
+      className={cn(
+        collapsed
+          ? "h-9 w-9 justify-center rounded-md"
+          : "w-full justify-start",
+      )}
+    >
+      <Link
+        href={href}
+        prefetch
+        aria-label={label}
+        className={cn(
+          "relative group flex items-center",
+          collapsed ? "justify-center" : "w-full",
+        )}
+      >
         {children}
       </Link>
     </Button>
@@ -33,18 +61,47 @@ function NavLink({ href, children }: { href: string; children: ReactNode }) {
 export function SidebarNav({
   closeOnNavigate = false,
   className,
+  collapsed = false,
 }: {
   closeOnNavigate?: boolean;
   className?: string;
+  collapsed?: boolean;
 }) {
   return (
-    <nav className={className ? className : "p-4 flex w-full flex-col gap-1"}>
+    <nav
+      className={cn(
+        "flex w-full flex-col gap-1",
+        collapsed ? "p-2 items-center" : "p-4",
+        className,
+      )}
+      data-collapsed={collapsed}
+    >
       {navigationItems.map((item) => {
         const content = (
-          <NavLink key={item.href} href={item.href}>
-            <span className="inline-flex items-center gap-2">
-              <item.icon className="h-4 w-4" /> {item.label}
+          <NavLink
+            key={item.href}
+            href={item.href}
+            label={item.label}
+            collapsed={collapsed}
+          >
+            <span
+              className={cn(
+                "inline-flex items-center gap-2",
+                collapsed && "flex-col",
+              )}
+            >
+              <item.icon className="h-4 w-4" />
+              {collapsed ? (
+                <span className="sr-only">{item.label}</span>
+              ) : (
+                <span className="text-sm">{item.label}</span>
+              )}
             </span>
+            {collapsed && (
+              <span className="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 whitespace-nowrap rounded-md border bg-background px-2 py-1 text-xs font-medium text-foreground shadow-sm opacity-0 transition-opacity group-hover:opacity-100">
+                {item.label}
+              </span>
+            )}
           </NavLink>
         );
 
