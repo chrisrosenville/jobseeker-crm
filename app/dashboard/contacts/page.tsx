@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useContacts } from "@/hooks/useContacts";
 import { useMemo, useState } from "react";
-import { Search, SlidersHorizontal, Users, X } from "lucide-react";
+import { Search, Users, X } from "lucide-react";
 import type { Contact } from "@prisma/client";
 
 type ContactWithJob = Contact & {
@@ -133,13 +133,9 @@ export default function ContactsPage() {
                 </Button>
               )}
             </div>
-            <div className="flex flex-wrap items-center gap-2">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <SlidersHorizontal className="h-4 w-4" />
-                Filters
-              </div>
+            <div className="flex shrink-0 items-center gap-2">
               <Select value={roleFilter} onValueChange={setRoleFilter}>
-                <SelectTrigger className="w-[160px]">
+                <SelectTrigger className="w-1/2 max-w-[150px]">
                   <SelectValue placeholder="All roles" />
                 </SelectTrigger>
                 <SelectContent>
@@ -156,7 +152,7 @@ export default function ContactsPage() {
                 value={sortBy}
                 onValueChange={(value) => setSortBy(value as "recent" | "name")}
               >
-                <SelectTrigger className="w-[140px]">
+                <SelectTrigger className="w-1/2 max-w-[150px]">
                   <SelectValue placeholder="Sort by" />
                 </SelectTrigger>
                 <SelectContent>

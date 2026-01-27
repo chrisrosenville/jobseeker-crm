@@ -5,7 +5,7 @@ import { LoadingScreen } from "@/components/LoadingScreen";
 import { AddJobDialog } from "@/components/modals/AddJobDialog";
 import { useJobApplications } from "@/hooks/useJobs";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { BriefcaseBusiness, Search, SlidersHorizontal, X } from "lucide-react";
+import { BriefcaseBusiness, Search, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -131,18 +131,14 @@ export default function JobsPage() {
                 </Button>
               )}
             </div>
-            <div className="flex flex-wrap items-center gap-2">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <SlidersHorizontal className="h-4 w-4" />
-                Filters
-              </div>
+            <div className="flex shrink-0 items-center gap-2">
               <Select
                 value={statusFilter}
                 onValueChange={(value) =>
                   setStatusFilter(value as "ALL" | JobStatus)
                 }
               >
-                <SelectTrigger className="w-[150px]">
+                <SelectTrigger className="w-1/2 max-w-[150px]">
                   <SelectValue placeholder="All statuses" />
                 </SelectTrigger>
                 <SelectContent>
@@ -160,7 +156,7 @@ export default function JobsPage() {
                   setSortBy(value as "recent" | "company" | "title")
                 }
               >
-                <SelectTrigger className="w-[140px]">
+                <SelectTrigger className="w-1/2 max-w-[150px]">
                   <SelectValue placeholder="Sort by" />
                 </SelectTrigger>
                 <SelectContent>
