@@ -22,7 +22,7 @@ import {
   Sparkles,
   Users,
 } from "lucide-react";
-import { JOB_STATUS_LABELS } from "@/lib/types";
+import { JOB_STATUS_LABELS, JobStatus } from "@/lib/types";
 
 export function BoardSection() {
   const {
@@ -42,8 +42,9 @@ export function BoardSection() {
       APPLIED: 0,
       INTERVIEW: 0,
       OFFER: 0,
+      GHOSTED: 0,
       REJECTED: 0,
-    },
+    } as Record<JobStatus, number>,
   );
 
   const totalApplications = jobApplications.length;

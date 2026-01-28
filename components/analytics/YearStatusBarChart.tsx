@@ -14,11 +14,18 @@ import {
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-const STATUS_KEYS = ["APPLIED", "INTERVIEW", "OFFER", "REJECTED"] as const;
+const STATUS_KEYS = [
+  "APPLIED",
+  "INTERVIEW",
+  "OFFER",
+  "GHOSTED",
+  "REJECTED",
+] as const;
 const STATUS_COLORS: Record<(typeof STATUS_KEYS)[number], string> = {
   APPLIED: "#3b82f6",
   INTERVIEW: "#6366f1",
   OFFER: "#10b981",
+  GHOSTED: "#f59e0b",
   REJECTED: "#ef4444",
 };
 
@@ -26,6 +33,7 @@ const STATUS_LABELS: Record<(typeof STATUS_KEYS)[number], string> = {
   APPLIED: "Applied",
   INTERVIEW: "Interview",
   OFFER: "Offer",
+  GHOSTED: "Ghosted",
   REJECTED: "Rejected",
 };
 
@@ -108,6 +116,7 @@ export function YearStatusBarChart({ jobs }: { jobs: JobDatum[] }) {
       APPLIED: 0,
       INTERVIEW: 0,
       OFFER: 0,
+      GHOSTED: 0,
       REJECTED: 0,
     }));
 

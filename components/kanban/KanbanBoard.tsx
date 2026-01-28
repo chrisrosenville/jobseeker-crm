@@ -28,6 +28,7 @@ export function KanbanBoard({
       APPLIED: [],
       INTERVIEW: [],
       OFFER: [],
+      GHOSTED: [],
       REJECTED: [],
     };
     for (const job of jobApplications) {
@@ -37,17 +38,17 @@ export function KanbanBoard({
   }, [jobApplications]);
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 6 } })
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
   );
 
   const handleDragStart = (event: DragStartEvent) => {
     // Check if any dialog is currently open
     const hasOpenDialog =
       document.querySelector(
-        '[data-slot="dialog-content"][data-state="open"]'
+        '[data-slot="dialog-content"][data-state="open"]',
       ) !== null ||
       document.querySelector(
-        '[data-slot="alert-dialog-content"][data-state="open"]'
+        '[data-slot="alert-dialog-content"][data-state="open"]',
       ) !== null;
 
     if (hasOpenDialog) {
@@ -77,7 +78,7 @@ export function KanbanBoard({
 
   const activeJob = useMemo(
     () => jobApplications.find((j) => j.id === activeId) ?? null,
-    [activeId, jobApplications]
+    [activeId, jobApplications],
   );
 
   return (
