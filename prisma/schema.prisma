@@ -15,6 +15,7 @@ model User {
   updatedAt    DateTime         @updatedAt
   contacts     Contact[]
   applications JobApplication[]
+  role         UserRole         @default(USER)
 }
 
 model JobApplication {
@@ -40,20 +41,33 @@ model Contact {
   name      String
   email     String?
   phone     String?
-  role      String?
   jobId     String?
   userId    String
   createdAt DateTime        @default(now())
   updatedAt DateTime        @updatedAt
+  role      ContactRole?
   job       JobApplication? @relation(fields: [jobId], references: [id])
   user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId], map: "idx_contact_user")
 }
 
+enum UserRole {
+  DEMO
+  USER
+}
+
 enum JobStatus {
   APPLIED
   INTERVIEW
   OFFER
+  GHOSTED
   REJECTED
+}
+
+enum ContactRole {
+  RECRUITER
+  HIRING_MANAGER
+  REFERRAL
+  OTHER
 }

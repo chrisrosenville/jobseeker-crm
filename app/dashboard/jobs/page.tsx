@@ -78,8 +78,9 @@ export default function JobsPage() {
       APPLIED: 0,
       INTERVIEW: 0,
       OFFER: 0,
+      GHOSTED: 0,
       REJECTED: 0,
-    },
+    } as Record<JobStatus, number>,
   );
 
   const hasFilters =

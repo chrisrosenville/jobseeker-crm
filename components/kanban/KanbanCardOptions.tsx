@@ -4,6 +4,7 @@ import { useState } from "react";
 import { MoreVertical, Pencil, Trash2 } from "lucide-react";
 
 import { useDeleteJobApplication } from "@/hooks/useJobs";
+import { useIsDemoUser } from "@/hooks/useUserRole";
 
 import { Button } from "../ui/button";
 import {
@@ -19,6 +20,7 @@ import { JobApplication } from "@prisma/client";
 import { toast } from "sonner";
 
 export const KanbanCardOptions = ({ job }: { job: JobApplication }) => {
+  const { isDemoUser } = useIsDemoUser();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -41,7 +43,13 @@ export const KanbanCardOptions = ({ job }: { job: JobApplication }) => {
     <>
       <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
         <DropdownMenuTrigger asChild>
-          <Button size="icon" variant="ghost" className="h-7 w-7 flex-shrink-0">
+          <Button
+            size="icon"
+            variant="ghost"
+            className="h-7 w-7 flex-shrink-0"
+            disabled={isDemoUser}
+            title={isDemoUser ? "Not available in demo mode" : undefined}
+          >
             <MoreVertical className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>

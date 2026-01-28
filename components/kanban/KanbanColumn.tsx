@@ -29,10 +29,12 @@ export function KanbanColumn({
           status === "APPLIED"
             ? "text-muted-foreground"
             : status === "INTERVIEW"
-            ? "text-blue-600"
-            : status === "OFFER"
-            ? "text-green-600"
-            : "text-red-600"
+              ? "text-blue-600"
+              : status === "OFFER"
+                ? "text-green-600"
+                : status === "GHOSTED"
+                  ? "text-amber-600"
+                  : "text-red-600"
         }`}
       >
         {JOB_STATUS_LABELS[status]}

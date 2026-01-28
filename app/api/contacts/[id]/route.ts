@@ -1,13 +1,23 @@
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { isDemoUser } from "@/lib/auth";
 
 export async function PATCH(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const { userId } = await auth();
-  if (!userId) return new NextResponse("Unauthorized", { status: 401 });
+  if (!userId) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
+
+  if (await isDemoUser()) {
+    return NextResponse.json(
+      { message: "Demo users cannot edit contacts" },
+      { status: 403 },
+    );
+  }
 
   const { id } = await params;
 
@@ -34,10 +44,19 @@ export async function PATCH(
 
 export async function DELETE(
   _request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const { userId } = await auth();
-  if (!userId) return new NextResponse("Unauthorized", { status: 401 });
+  if (!userId) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
+
+  if (await isDemoUser()) {
+    return NextResponse.json(
+      { message: "Demo users cannot delete contacts" },
+      { status: 403 },
+    );
+  }
 
   const { id } = await params;
 

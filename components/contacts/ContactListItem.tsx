@@ -14,6 +14,9 @@ import {
 import { MoreVertical, Pencil, Trash2, Mail, Phone } from "lucide-react";
 import { EditContactDialog } from "@/components/modals/EditContactDialog";
 import { Card, CardContent } from "@/components/ui/card";
+import { useIsDemoUser } from "@/hooks/useUserRole";
+import { useDeleteContact } from "@/hooks/useContacts";
+import { CONTACT_ROLE_LABELS, ContactRole } from "@/lib/types";
 
 function getInitials(name: string) {
   const parts = name.trim().split(/\s+/);
@@ -35,9 +38,15 @@ export function ContactListItem({
   email: string | null;
   phone?: string | null;
 }) {
+  const { isDemoUser } = useIsDemoUser();
   const router = useRouter();
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const deleteContact = useDeleteContact();
+
+  const displayRole = role
+    ? CONTACT_ROLE_LABELS[role as ContactRole] || role
+    : null;
 
   return (
     <Card className="transition-shadow hover:shadow-sm p-2">
@@ -52,9 +61,9 @@ export function ContactListItem({
                 <div className="text-sm font-semibold leading-tight">
                   {name}
                 </div>
-                {role && (
+                {displayRole && (
                   <div className="mt-1 text-xs text-muted-foreground">
-                    {role}
+                    {displayRole}
                   </div>
                 )}
               </div>
@@ -84,7 +93,13 @@ export function ContactListItem({
           <div className="shrink-0">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button size="icon" variant="ghost" className="h-7 w-7">
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="h-7 w-7"
+                  disabled={isDemoUser}
+                  title={isDemoUser ? "Not available in demo mode" : undefined}
+                >
                   <MoreVertical className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
@@ -131,9 +146,8 @@ export function ContactListItem({
           open={deleteOpen}
           setOpen={setDeleteOpen}
           onConfirm={async () => {
-            await fetch(`/api/contacts/${id}`, { method: "DELETE" });
+            await deleteContact.mutateAsync(id);
             setDeleteOpen(false);
-            router.refresh();
           }}
         />
       </CardContent>

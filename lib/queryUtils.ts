@@ -31,8 +31,11 @@ export const globalCacheSettings = {
 };
 
 export const invalidationPatterns = {
-  jobsApplications: (queryClient: QueryClient) =>
-    queryClient.invalidateQueries({ queryKey: queryKeys.jobsApplications }),
+  jobsApplications: (queryClient: QueryClient) => {
+    queryClient.invalidateQueries({ queryKey: queryKeys.jobsApplications });
+    // Also invalidate all individual job queries
+    queryClient.invalidateQueries({ queryKey: ["jobApplication"] });
+  },
   contacts: (queryClient: QueryClient) =>
     queryClient.invalidateQueries({ queryKey: queryKeys.contacts }),
   user: (queryClient: QueryClient) =>
@@ -54,7 +57,7 @@ export const optimisticUpdates = {
         }
 
         return [...old, job];
-      }
+      },
     ),
   jobsStatus: (queryClient: QueryClient, job: JobApplication) =>
     queryClient.setQueryData(
@@ -70,7 +73,7 @@ export const optimisticUpdates = {
         }
 
         return [...old, job];
-      }
+      },
     ),
   contacts: (queryClient: QueryClient, contact: Contact) =>
     queryClient.setQueryData(
@@ -86,7 +89,7 @@ export const optimisticUpdates = {
         }
         // Add new contact
         return [...old, contact];
-      }
+      },
     ),
   user: (queryClient: QueryClient, user: User) =>
     queryClient.setQueryData(queryKeys.user, user),
@@ -96,10 +99,10 @@ export const optimisticDeletes = {
   jobsApplications: (queryClient: QueryClient, id: string) =>
     queryClient.setQueryData(
       queryKeys.jobsApplications,
-      (old: JobApplication[]) => old.filter((job) => job.id !== id)
+      (old: JobApplication[]) => old.filter((job) => job.id !== id),
     ),
   contacts: (queryClient: QueryClient, id: string) =>
     queryClient.setQueryData(queryKeys.contacts, (old: Contact[]) =>
-      old.filter((contact) => contact.id !== id)
+      old.filter((contact) => contact.id !== id),
     ),
 };

@@ -11,8 +11,10 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useClerk } from "@clerk/nextjs";
+import { useIsDemoUser } from "@/hooks/useUserRole";
 
 export function AccountActions() {
+  const { isDemoUser } = useIsDemoUser();
   const router = useRouter();
   const [loading, setLoading] = useState<string | null>(null);
   const { signOut } = useClerk();
@@ -29,7 +31,7 @@ export function AccountActions() {
   async function handleDeleteAccount() {
     if (
       !confirm(
-        "Are you sure you want to delete your account? This cannot be undone."
+        "Are you sure you want to delete your account? This cannot be undone.",
       )
     )
       return;
@@ -63,7 +65,8 @@ export function AccountActions() {
           <Button
             variant="destructive"
             onClick={handleDeleteAccount}
-            disabled={loading === "delete"}
+            disabled={loading === "delete" || isDemoUser}
+            title={isDemoUser ? "Not available in demo mode" : undefined}
           >
             {loading === "delete" ? "Deleting…" : "Delete account"}
           </Button>

@@ -57,7 +57,7 @@ export function EditJobDialog({
   const { mutateAsync: updateJobApplication } = useUpdateJobApplication();
 
   function handleChange(
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) {
     const { name, value } = e.target;
     if (name === "link") {
@@ -97,101 +97,130 @@ export function EditJobDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       {trigger ? <DialogTrigger asChild>{trigger}</DialogTrigger> : null}
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>Edit job</DialogTitle>
+      <DialogContent className="sm:max-w-lg">
+        <DialogHeader className="space-y-2 pb-4">
+          <DialogTitle className="text-xl font-semibold">
+            Edit job application
+          </DialogTitle>
+          <p className="text-sm text-muted-foreground">
+            Update details for this opportunity.
+          </p>
         </DialogHeader>
-        <form onSubmit={onSubmit} className="grid gap-3">
-          <div className="grid gap-1">
-            <Label htmlFor="title">Job title</Label>
-            <Input
-              id="title"
-              name="title"
-              value={formData.title}
-              onChange={handleChange}
-              required
-            />
+        <form onSubmit={onSubmit} className="space-y-6">
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="title" className="text-sm font-medium">
+                Job title
+              </Label>
+              <Input
+                id="title"
+                name="title"
+                value={formData.title}
+                onChange={handleChange}
+                required
+                className="h-10"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="company" className="text-sm font-medium">
+                Company
+              </Label>
+              <Input
+                id="company"
+                name="company"
+                value={formData.company}
+                onChange={handleChange}
+                required
+                className="h-10"
+              />
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="dateApplied" className="text-sm font-medium">
+                  Date applied
+                </Label>
+                <Input
+                  id="dateApplied"
+                  name="dateApplied"
+                  type="date"
+                  value={formData.dateApplied.toISOString().split("T")[0]}
+                  onChange={handleChange}
+                  className="h-10"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="salary" className="text-sm font-medium">
+                  Salary
+                </Label>
+                <Input
+                  id="salary"
+                  name="salary"
+                  type="text"
+                  placeholder="e.g. $85,000"
+                  value={formData.salary ?? ""}
+                  onChange={handleChange}
+                  className="h-10"
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="link" className="text-sm font-medium">
+                Link
+              </Label>
+              <Input
+                id="link"
+                name="link"
+                value={formData.link?.toString() || ""}
+                onChange={handleChange}
+                className="h-10"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Status</Label>
+              <Select
+                name="status"
+                value={formData.status}
+                onValueChange={(v) =>
+                  setFormData({ ...formData, status: v as JobStatus })
+                }
+              >
+                <SelectTrigger className="h-10">
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  {JOB_STATUS_ORDER.map((s) => (
+                    <SelectItem key={s} value={s}>
+                      {s}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="notes" className="text-sm font-medium">
+                Notes
+              </Label>
+              <Textarea
+                id="notes"
+                name="notes"
+                value={formData.notes || ""}
+                onChange={handleChange}
+                rows={3}
+                className="resize-none"
+              />
+            </div>
           </div>
-          <div className="grid gap-1">
-            <Label htmlFor="company">Company</Label>
-            <Input
-              id="company"
-              name="company"
-              value={formData.company}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="grid gap-1">
-            <Label htmlFor="link">Link</Label>
-            <Input
-              id="link"
-              name="link"
-              value={formData.link?.toString() || ""}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="grid gap-1">
-            <Label htmlFor="dateApplied">Date applied</Label>
-            <Input
-              id="dateApplied"
-              name="dateApplied"
-              type="date"
-              value={formData.dateApplied.toLocaleDateString()}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="grid gap-1">
-            <Label htmlFor="salary">Salary</Label>
-            <Input
-              id="salary"
-              name="salary"
-              type="text"
-              placeholder="35,000"
-              value={formData.salary ?? ""}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="grid gap-1">
-            <Label>Status</Label>
-            <Select
-              name="status"
-              value={formData.status}
-              onValueChange={(v) =>
-                setFormData({ ...formData, status: v as JobStatus })
-              }
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select status" />
-              </SelectTrigger>
-              <SelectContent>
-                {JOB_STATUS_ORDER.map((s) => (
-                  <SelectItem key={s} value={s}>
-                    {s}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="grid gap-1">
-            <Label htmlFor="notes">Notes</Label>
-            <Textarea
-              id="notes"
-              name="notes"
-              value={formData.notes || ""}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="mt-2 flex justify-end gap-2">
+          <div className="flex justify-end gap-3 pt-4 border-t">
             <Button
               type="button"
-              variant="ghost"
+              variant="outline"
               onClick={() => onOpenChange?.(false)}
+              disabled={loading}
             >
               Cancel
             </Button>
             <Button type="submit" disabled={loading}>
-              {loading ? "Saving..." : "Save"}
+              {loading ? "Saving..." : "Save changes"}
             </Button>
           </div>
         </form>
