@@ -37,3 +37,17 @@ export const JOB_STATUS_LABELS: Record<JobStatus, string> = {
   GHOSTED: "Ghosted",
   REJECTED: "Rejected",
 };
+
+export const CONTACT_ROLE_ORDER: ContactRole[] = [
+  "RECRUITER",
+  "HIRING_MANAGER",
+  "REFERRAL",
+  "OTHER",
+];
+
+export const CONTACT_ROLE_LABELS: Record<ContactRole, string> = {
+  RECRUITER: "Recruiter",
+  HIRING_MANAGER: "Hiring Manager",
+  REFERRAL: "Referral",
+  OTHER: "Other",
+};

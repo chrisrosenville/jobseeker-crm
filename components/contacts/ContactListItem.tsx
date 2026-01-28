@@ -15,7 +15,8 @@ import { MoreVertical, Pencil, Trash2, Mail, Phone } from "lucide-react";
 import { EditContactDialog } from "@/components/modals/EditContactDialog";
 import { Card, CardContent } from "@/components/ui/card";
 import { useIsDemoUser } from "@/hooks/useUserRole";
-import { toast } from "sonner";
+import { useDeleteContact } from "@/hooks/useContacts";
+import { CONTACT_ROLE_LABELS, ContactRole } from "@/lib/types";
 
 function getInitials(name: string) {
   const parts = name.trim().split(/\s+/);
@@ -41,6 +42,11 @@ export function ContactListItem({
   const router = useRouter();
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const deleteContact = useDeleteContact();
+
+  const displayRole = role
+    ? CONTACT_ROLE_LABELS[role as ContactRole] || role
+    : null;
 
   return (
     <Card className="transition-shadow hover:shadow-sm p-2">
@@ -55,9 +61,9 @@ export function ContactListItem({
                 <div className="text-sm font-semibold leading-tight">
                   {name}
                 </div>
-                {role && (
+                {displayRole && (
                   <div className="mt-1 text-xs text-muted-foreground">
-                    {role}
+                    {displayRole}
                   </div>
                 )}
               </div>
@@ -140,23 +146,8 @@ export function ContactListItem({
           open={deleteOpen}
           setOpen={setDeleteOpen}
           onConfirm={async () => {
-            try {
-              const res = await fetch(`/api/contacts/${id}`, {
-                method: "DELETE",
-              });
-              if (!res.ok) {
-                const data = await res.json().catch(() => ({}));
-                throw new Error(data.message || "Failed to delete contact");
-              }
-              setDeleteOpen(false);
-              router.refresh();
-            } catch (error) {
-              const message =
-                error instanceof Error
-                  ? error.message
-                  : "Failed to delete contact";
-              toast.error(message);
-            }
+            await deleteContact.mutateAsync(id);
+            setDeleteOpen(false);
           }}
         />
       </CardContent>

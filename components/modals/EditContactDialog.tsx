@@ -11,7 +11,19 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
+import {
+  CONTACT_ROLE_ORDER,
+  CONTACT_ROLE_LABELS,
+  ContactRole,
+} from "@/lib/types";
 
 type Props = {
   contact: {
@@ -75,42 +87,83 @@ export function EditContactDialog({
   return (
     <Dialog open={isOpen} onOpenChange={setOpen}>
       {trigger ? <DialogTrigger asChild>{trigger}</DialogTrigger> : null}
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>Edit contact</DialogTitle>
+      <DialogContent className="sm:max-w-lg">
+        <DialogHeader className="space-y-2 pb-4">
+          <DialogTitle className="text-xl font-semibold">
+            Edit contact
+          </DialogTitle>
+          <p className="text-sm text-muted-foreground">
+            Update contact information.
+          </p>
         </DialogHeader>
-        <form action={(fd) => onSubmit(fd)} className="grid gap-3">
-          <div className="grid gap-1">
-            <Label htmlFor="name">Name</Label>
-            <Input id="name" name="name" defaultValue={contact.name} required />
+        <form action={(fd) => onSubmit(fd)} className="space-y-6">
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="name" className="text-sm font-medium">
+                Name
+              </Label>
+              <Input
+                id="name"
+                name="name"
+                defaultValue={contact.name}
+                required
+                className="h-10"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="role" className="text-sm font-medium">
+                Role
+              </Label>
+              <Select name="role" defaultValue={contact.role || undefined}>
+                <SelectTrigger className="h-10">
+                  <SelectValue placeholder="Select a role" />
+                </SelectTrigger>
+                <SelectContent>
+                  {CONTACT_ROLE_ORDER.map((role) => (
+                    <SelectItem key={role} value={role}>
+                      {CONTACT_ROLE_LABELS[role]}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-sm font-medium">
+                  Email
+                </Label>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  defaultValue={contact.email || ""}
+                  className="h-10"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="phone" className="text-sm font-medium">
+                  Phone
+                </Label>
+                <Input
+                  id="phone"
+                  name="phone"
+                  defaultValue={contact.phone || ""}
+                  className="h-10"
+                />
+              </div>
+            </div>
           </div>
-          <div className="grid gap-1">
-            <Label htmlFor="role">Role</Label>
-            <Input id="role" name="role" defaultValue={contact.role || ""} />
-          </div>
-          <div className="grid gap-1">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              defaultValue={contact.email || ""}
-            />
-          </div>
-          <div className="grid gap-1">
-            <Label htmlFor="phone">Phone</Label>
-            <Input id="phone" name="phone" defaultValue={contact.phone || ""} />
-          </div>
-          <div className="mt-2 flex justify-end gap-2">
+          <div className="flex justify-end gap-3 pt-4 border-t">
             <Button
               type="button"
-              variant="ghost"
+              variant="outline"
               onClick={() => setOpen(false)}
+              disabled={loading}
             >
               Cancel
             </Button>
             <Button type="submit" disabled={loading}>
-              {loading ? "Saving..." : "Save"}
+              {loading ? "Saving..." : "Save changes"}
             </Button>
           </div>
         </form>

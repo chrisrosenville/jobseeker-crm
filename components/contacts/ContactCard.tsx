@@ -28,6 +28,7 @@ import {
 import { EditContactDialog } from "@/components/modals/EditContactDialog";
 import { ConfirmDelete } from "@/components/ConfirmDelete";
 import { useRouter } from "next/navigation";
+import { CONTACT_ROLE_LABELS, ContactRole } from "@/lib/types";
 
 function getInitials(name: string) {
   const parts = name.trim().split(/\s+/);
@@ -57,22 +58,34 @@ export function ContactCard({
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
 
+  const displayRole = role
+    ? CONTACT_ROLE_LABELS[role as ContactRole] || role
+    : "Contact";
+
   return (
     <Card>
       <CardHeader className="border-b">
-        <div className="flex items-start justify-between">
-          <div className="flex items-start gap-3">
-            <Avatar>
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex items-start gap-3 min-w-0 flex-1">
+            <Avatar className="flex-shrink-0">
               <AvatarFallback>{getInitials(name)}</AvatarFallback>
             </Avatar>
-            <div>
-              <CardTitle className="leading-tight">{name}</CardTitle>
-              <CardDescription>{role || "Contact"}</CardDescription>
+            <div className="min-w-0 flex-1">
+              <CardTitle className="leading-tight truncate break-all">
+                {name}
+              </CardTitle>
+              <CardDescription className="truncate break-all">
+                {displayRole}
+              </CardDescription>
             </div>
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button size="icon" variant="ghost" className="h-8 w-8">
+              <Button
+                size="icon"
+                variant="ghost"
+                className="h-8 w-8 flex-shrink-0"
+              >
                 <MoreVertical className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
@@ -103,7 +116,7 @@ export function ContactCard({
           </DropdownMenu>
         </div>
       </CardHeader>
-      <CardContent className="py-6">
+      <CardContent>
         <div className="grid gap-2 text-sm">
           {company || jobTitle ? (
             <div className="inline-flex items-center gap-2 text-muted-foreground">

@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { JobApplication } from "@prisma/client";
+import { JobApplication, Contact } from "@prisma/client";
 import { toast } from "sonner";
 
 import { api } from "@/lib/api";
@@ -13,6 +13,10 @@ import {
 } from "@/lib/queryUtils";
 import { CreateOrUpdateJobApplication, JobStatus } from "@/lib/types";
 
+type JobApplicationWithContacts = JobApplication & {
+  contacts?: Contact[];
+};
+
 export function useJobApplications() {
   return useQuery<JobApplication[]>({
     queryKey: queryKeys.jobsApplications,
@@ -22,9 +26,9 @@ export function useJobApplications() {
 }
 
 export function useJobApplication(id: string) {
-  return useQuery<JobApplication | undefined>({
+  return useQuery<JobApplicationWithContacts | undefined>({
     queryKey: queryKeys.jobApplication(id),
-    queryFn: () => api.get<JobApplication>(`/api/jobs/${id}`),
+    queryFn: () => api.get<JobApplicationWithContacts>(`/api/jobs/${id}`),
     enabled: !!id,
     initialData: undefined,
     ...globalCacheSettings.jobApplication,
