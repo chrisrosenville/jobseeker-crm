@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 
 type Props = {
   contact: {
@@ -41,21 +42,34 @@ export function EditContactDialog({
 
   async function onSubmit(formData: FormData) {
     setLoading(true);
-    const payload = {
-      name: String(formData.get("name") || ""),
-      role: (formData.get("role") as string) || "",
-      email: (formData.get("email") as string) || "",
-      phone: (formData.get("phone") as string) || "",
-    };
-    await fetch(`/api/contacts/${contact.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    setLoading(false);
-    setOpen(false);
-    if (onUpdated) onUpdated();
-    else if (typeof window !== "undefined") window.location.reload();
+    try {
+      const payload = {
+        name: String(formData.get("name") || ""),
+        role: (formData.get("role") as string) || "",
+        email: (formData.get("email") as string) || "",
+        phone: (formData.get("phone") as string) || "",
+      };
+      const res = await fetch(`/api/contacts/${contact.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.message || "Failed to update contact");
+      }
+
+      setLoading(false);
+      setOpen(false);
+      if (onUpdated) onUpdated();
+      else if (typeof window !== "undefined") window.location.reload();
+    } catch (error) {
+      setLoading(false);
+      const message =
+        error instanceof Error ? error.message : "Failed to update contact";
+      toast.error(message);
+    }
   }
 
   return (

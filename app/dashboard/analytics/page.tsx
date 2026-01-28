@@ -1,7 +1,14 @@
 import { prisma } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
-import { StatusBarChart } from "@/components/analytics/StatusBarChart";
-import { TimelineLineChart } from "@/components/analytics/TimelineLineChart";
+import { YearStatusBarChart } from "@/components/analytics/YearStatusBarChart";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { BarChart3, Sparkles, TrendingUp } from "lucide-react";
 
 export default async function AnalyticsPage() {
   const { userId } = await auth();
@@ -9,64 +16,75 @@ export default async function AnalyticsPage() {
 
   const jobs = await prisma.jobApplication.findMany({ where: { userId } });
 
-  const statusCounts = ["APPLIED", "INTERVIEW", "OFFER", "REJECTED"].map(
-    (k) => ({
-      status: k,
-      count: jobs.filter((j) => j.status === k).length,
-    })
-  );
-
-  const byDayMap = new Map<string, number>();
-  for (const j of jobs) {
-    const d = new Date(j.dateApplied);
-    const key = new Date(d.getFullYear(), d.getMonth(), d.getDate())
-      .toISOString()
-      .slice(0, 10);
-    byDayMap.set(key, (byDayMap.get(key) || 0) + 1);
-  }
-  const timeline = Array.from(byDayMap.entries())
-    .sort((a, b) => a[0].localeCompare(b[0]))
-    .map(([date, count]) => ({ date, count }));
-
-  const conversions = [
-    { stage: "Applications", value: jobs.length },
-    {
-      stage: "Interviews",
-      value: jobs.filter((j) => j.status === "INTERVIEW").length,
-    },
-    { stage: "Offers", value: jobs.filter((j) => j.status === "OFFER").length },
-  ];
+  const activeCount = jobs.filter(
+    (j) => j.status === "APPLIED" || j.status === "INTERVIEW",
+  ).length;
 
   return (
     <div className="space-y-8">
-      <h1 className="text-2xl font-semibold">Analytics</h1>
+      <header className="space-y-1">
+        <p className="text-sm text-muted-foreground">Analytics</p>
+        <h1 className="text-2xl font-bold tracking-tight md:text-3xl">
+          See momentum at a glance.
+        </h1>
+        <p className="text-muted-foreground text-sm md:text-base">
+          {"Track progress across your pipeline and understand what's working."}
+        </p>
+      </header>
 
-      <div className="grid gap-6">
-        <div className="rounded-xl border bg-card p-6 shadow-sm">
-          <h2 className="text-base font-semibold">Applications per status</h2>
-          <StatusBarChart data={statusCounts} />
-        </div>
+      <section className="grid gap-4 md:grid-cols-3">
+        {[
+          {
+            title: "Applications",
+            value: jobs.length,
+            description: "Total roles tracked",
+            icon: BarChart3,
+          },
+          {
+            title: "Active pipeline",
+            value: activeCount,
+            description: "Applied + interview",
+            icon: TrendingUp,
+          },
+          {
+            title: "Offers",
+            value: jobs.filter((j) => j.status === "OFFER").length,
+            description: "Decision-ready roles",
+            icon: Sparkles,
+          },
+        ].map((item) => (
+          <Card key={item.title}>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle className="text-base font-semibold">
+                  {item.title}
+                </CardTitle>
+                <CardDescription>{item.description}</CardDescription>
+              </div>
+              <div className="rounded-full border bg-muted/40 p-2 text-muted-foreground">
+                <item.icon className="h-4 w-4" />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-semibold">{item.value}</div>
+            </CardContent>
+          </Card>
+        ))}
+      </section>
 
-        <div className="rounded-xl border bg-card p-6 shadow-sm">
-          <h2 className="text-base font-semibold">Applications over time</h2>
-          <TimelineLineChart data={timeline} />
-        </div>
-      </div>
-
-      <div className="rounded-xl border bg-card p-6 shadow-sm">
-        <h2 className="text-base font-semibold">Conversion funnel</h2>
-        <div className="mt-4 grid gap-3 sm:grid-cols-3">
-          {conversions.map((c) => (
-            <div
-              key={c.stage}
-              className="rounded border bg-muted p-4 text-center"
-            >
-              <div className="text-sm text-muted-foreground">{c.stage}</div>
-              <div className="text-2xl font-bold">{c.value}</div>
-            </div>
-          ))}
-        </div>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base font-semibold">
+            Job status trends
+          </CardTitle>
+          <CardDescription>
+            Compare monthly activity across each stage.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <YearStatusBarChart jobs={jobs} />
+        </CardContent>
+      </Card>
     </div>
   );
 }

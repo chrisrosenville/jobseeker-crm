@@ -2,11 +2,19 @@ import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { clerkClient } from "@clerk/nextjs/server";
+import { isDemoUser } from "@/lib/auth";
 
 export async function DELETE() {
   const { userId } = await auth();
   if (!userId)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  if (await isDemoUser()) {
+    return NextResponse.json(
+      { error: "Demo users cannot delete their account" },
+      { status: 403 },
+    );
+  }
 
   // Delete user data from our DB
   await prisma.contact.deleteMany({ where: { userId } });

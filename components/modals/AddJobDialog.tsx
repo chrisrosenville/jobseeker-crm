@@ -15,8 +15,10 @@ import { Textarea } from "@/components/ui/textarea";
 
 import { CreateOrUpdateJobApplication } from "@/lib/types";
 import { useCreateJobApplication } from "@/hooks/useJobs";
+import { useIsDemoUser } from "@/hooks/useUserRole";
 
 export function AddJobDialog() {
+  const { isDemoUser } = useIsDemoUser();
   const [formData, setFormData] = useState<CreateOrUpdateJobApplication>({
     title: "",
     company: "",
@@ -29,7 +31,7 @@ export function AddJobDialog() {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{ path: string[]; message: string }[]>(
-    []
+    [],
   );
   const { mutateAsync: createJobApplication } = useCreateJobApplication();
 
@@ -49,7 +51,7 @@ export function AddJobDialog() {
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -79,7 +81,12 @@ export function AddJobDialog() {
       }}
     >
       <DialogTrigger asChild>
-        <Button>+ Add Job</Button>
+        <Button
+          disabled={isDemoUser}
+          title={isDemoUser ? "Not available in demo mode" : undefined}
+        >
+          + Add Job
+        </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>

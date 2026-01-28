@@ -14,6 +14,8 @@ import {
 import { MoreVertical, Pencil, Trash2, Mail, Phone } from "lucide-react";
 import { EditContactDialog } from "@/components/modals/EditContactDialog";
 import { Card, CardContent } from "@/components/ui/card";
+import { useIsDemoUser } from "@/hooks/useUserRole";
+import { toast } from "sonner";
 
 function getInitials(name: string) {
   const parts = name.trim().split(/\s+/);
@@ -35,6 +37,7 @@ export function ContactListItem({
   email: string | null;
   phone?: string | null;
 }) {
+  const { isDemoUser } = useIsDemoUser();
   const router = useRouter();
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -84,7 +87,13 @@ export function ContactListItem({
           <div className="shrink-0">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button size="icon" variant="ghost" className="h-7 w-7">
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="h-7 w-7"
+                  disabled={isDemoUser}
+                  title={isDemoUser ? "Not available in demo mode" : undefined}
+                >
                   <MoreVertical className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
@@ -131,9 +140,23 @@ export function ContactListItem({
           open={deleteOpen}
           setOpen={setDeleteOpen}
           onConfirm={async () => {
-            await fetch(`/api/contacts/${id}`, { method: "DELETE" });
-            setDeleteOpen(false);
-            router.refresh();
+            try {
+              const res = await fetch(`/api/contacts/${id}`, {
+                method: "DELETE",
+              });
+              if (!res.ok) {
+                const data = await res.json().catch(() => ({}));
+                throw new Error(data.message || "Failed to delete contact");
+              }
+              setDeleteOpen(false);
+              router.refresh();
+            } catch (error) {
+              const message =
+                error instanceof Error
+                  ? error.message
+                  : "Failed to delete contact";
+              toast.error(message);
+            }
           }}
         />
       </CardContent>

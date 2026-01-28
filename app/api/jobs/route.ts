@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { JobApplication } from "@prisma/client";
+import { isDemoUser } from "@/lib/auth";
 
 const jobSchema = z.object({
   title: z
@@ -21,7 +22,9 @@ const jobSchema = z.object({
 
 export async function GET() {
   const { userId } = await auth();
-  if (!userId) return new NextResponse("Unauthorized", { status: 401 });
+  if (!userId) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
 
   const jobApplications = await prisma.jobApplication.findMany({
     where: { userId },
@@ -40,18 +43,28 @@ export async function GET() {
 
 export async function POST(request: Request) {
   const { userId } = await auth();
-  if (!userId) return new NextResponse("Unauthorized", { status: 401 });
+  if (!userId) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
+
+  if (await isDemoUser()) {
+    return NextResponse.json(
+      { message: "Demo users cannot create jobs" },
+      { status: 403 },
+    );
+  }
 
   const body = await request.json();
   const parsed = jobSchema.safeParse(body);
   if (!parsed.success) {
-    return new NextResponse(
-      JSON.stringify({
+    return NextResponse.json(
+      {
+        message: "Validation failed",
         errors: parsed.error.issues.map((issue) => ({
           path: issue.path,
           message: issue.message,
         })),
-      }),
+      },
       { status: 400 },
     );
   }
@@ -70,9 +83,10 @@ export async function POST(request: Request) {
   });
 
   if (!newJobApplication) {
-    return new NextResponse("Internal server error", {
-      status: 500,
-    });
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 },
+    );
   }
 
   const {

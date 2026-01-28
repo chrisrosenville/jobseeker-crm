@@ -1,13 +1,16 @@
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { isDemoUser } from "@/lib/auth";
 
 export async function GET(
   _request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const { userId } = await auth();
-  if (!userId) return new NextResponse("Unauthorized", { status: 401 });
+  if (!userId) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
 
   const { id } = await params;
 
@@ -15,16 +18,27 @@ export async function GET(
     where: { id, userId },
     include: { contacts: true },
   });
-  if (!job) return new NextResponse("Not found", { status: 404 });
+  if (!job) {
+    return NextResponse.json({ message: "Job not found" }, { status: 404 });
+  }
   return NextResponse.json(job);
 }
 
 export async function PATCH(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const { userId } = await auth();
-  if (!userId) return new NextResponse("Unauthorized", { status: 401 });
+  if (!userId) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
+
+  if (await isDemoUser()) {
+    return NextResponse.json(
+      { message: "Demo users cannot edit jobs" },
+      { status: 403 },
+    );
+  }
 
   const { id } = await params;
 
@@ -43,25 +57,36 @@ export async function PATCH(
       ...("status" in data ? { status: data.status } : {}),
     },
   });
-  if (job.userId !== userId)
-    return new NextResponse("Forbidden", { status: 403 });
+  if (job.userId !== userId) {
+    return NextResponse.json({ message: "Forbidden" }, { status: 403 });
+  }
   return NextResponse.json(job);
 }
 
 export async function DELETE(
   _request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const { userId } = await auth();
-  if (!userId) return new NextResponse("Unauthorized", { status: 401 });
+  if (!userId) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
+
+  if (await isDemoUser()) {
+    return NextResponse.json(
+      { message: "Demo users cannot delete jobs" },
+      { status: 403 },
+    );
+  }
 
   const { id } = await params;
 
   const existing = await prisma.jobApplication.findUnique({
     where: { id },
   });
-  if (!existing || existing.userId !== userId)
-    return new NextResponse("Not found", { status: 404 });
+  if (!existing || existing.userId !== userId) {
+    return NextResponse.json({ message: "Job not found" }, { status: 404 });
+  }
 
   await prisma.jobApplication.delete({ where: { id } });
   return new NextResponse(null, { status: 204 });

@@ -45,7 +45,11 @@ export function useCreateJobApplication() {
     },
     onError: (error) => {
       console.error(error);
-      toast.error("Failed to create job application");
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Failed to create job application";
+      toast.error(message);
     },
   });
 }
@@ -57,7 +61,7 @@ export function useUpdateJobApplication() {
     mutationFn: async (jobApplication: CreateOrUpdateJobApplication) => {
       return api.patch<JobApplication>(
         `/api/jobs/${jobApplication.id}`,
-        jobApplication
+        jobApplication,
       );
     },
     onSuccess: (jobApplication) => {
@@ -67,7 +71,11 @@ export function useUpdateJobApplication() {
     },
     onError: (error) => {
       console.error(error);
-      toast.error("Failed to update job application");
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Failed to update job application";
+      toast.error(message);
     },
   });
 }
@@ -85,14 +93,14 @@ export function useUpdateJobStatus() {
 
       // Snapshot the previous value
       const previousJobs = qc.getQueryData<JobApplication[]>(
-        queryKeys.jobsApplications
+        queryKeys.jobsApplications,
       );
 
       // Optimistically update to the new status
       if (previousJobs) {
         qc.setQueryData<JobApplication[]>(
           queryKeys.jobsApplications,
-          previousJobs.map((job) => (job.id === id ? { ...job, status } : job))
+          previousJobs.map((job) => (job.id === id ? { ...job, status } : job)),
         );
       }
 
@@ -105,6 +113,9 @@ export function useUpdateJobStatus() {
         qc.setQueryData(queryKeys.jobsApplications, context.previousJobs);
       }
       console.error(error);
+      const message =
+        error instanceof Error ? error.message : "Failed to update job status";
+      toast.error(message);
     },
     onSuccess: (updatedJob) => {
       // Update with the actual response from the server
@@ -127,7 +138,11 @@ export function useDeleteJobApplication() {
     },
     onError: (error) => {
       console.error(error);
-      toast.error("Failed to delete job application");
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Failed to delete job application";
+      toast.error(message);
     },
   });
 }

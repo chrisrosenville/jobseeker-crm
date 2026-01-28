@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import OpenAI from "openai";
 import { z } from "zod";
+import { isDemoUser } from "@/lib/auth";
 
 // @ts-expect-error - Expecting error since we're not importing from the default index file in the package.
 import pdfParse from "pdf-parse/lib/pdf-parse.js";
@@ -15,6 +16,13 @@ export async function POST(request: Request) {
 
   const user = await currentUser();
   if (!user) return new NextResponse("Unauthorized", { status: 401 });
+
+  if (await isDemoUser()) {
+    return NextResponse.json(
+      { message: "AI features are not available for demo users" },
+      { status: 403 },
+    );
+  }
 
   try {
     const contentType = request.headers.get("content-type");

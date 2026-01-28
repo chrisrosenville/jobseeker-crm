@@ -32,6 +32,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
+import { useIsDemoUser } from "@/hooks/useUserRole";
 
 const QUICK_SUGGESTIONS = [
   "Make it shorter and punchier",
@@ -43,6 +44,7 @@ const QUICK_SUGGESTIONS = [
 ];
 
 export default function AiApplicationPage() {
+  const { isDemoUser } = useIsDemoUser();
   const [file, setFile] = useState<File | null>(null);
   const [creativity, setCreativity] = useState<number>(0.6);
   const [age, setAge] = useState<string>("");
@@ -89,6 +91,12 @@ export default function AiApplicationPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+
+    if (isDemoUser) {
+      toast.error("AI features are not available in demo mode.");
+      return;
+    }
+
     if (!file) {
       toast.error("Please upload your resume as a PDF.");
       return;
@@ -159,6 +167,11 @@ export default function AiApplicationPage() {
   }
 
   async function handleRefine() {
+    if (isDemoUser) {
+      toast.error("AI features are not available in demo mode.");
+      return;
+    }
+
     if (!feedback.trim()) {
       toast.error("Please provide feedback for refinement.");
       return;
@@ -400,7 +413,11 @@ export default function AiApplicationPage() {
 
               {/* Submit button and copy button */}
               <div className="flex items-center gap-3">
-                <Button type="submit" disabled={loading || !!hasConversation}>
+                <Button
+                  type="submit"
+                  disabled={loading || !!hasConversation || isDemoUser}
+                  title={isDemoUser ? "Not available in demo mode" : undefined}
+                >
                   {loading
                     ? "Generating…"
                     : hasConversation
@@ -534,7 +551,7 @@ export default function AiApplicationPage() {
                   type="button"
                   variant="outline"
                   size="sm"
-                  disabled={loading || !hasConversation}
+                  disabled={loading || !hasConversation || isDemoUser}
                   onClick={() => {
                     setFeedback(s);
                     setTimeout(() => handleRefine(), 0);
@@ -551,13 +568,16 @@ export default function AiApplicationPage() {
               value={feedback}
               onChange={(e) => setFeedback(e.target.value)}
               rows={3}
-              disabled={loading || !hasConversation}
+              disabled={loading || !hasConversation || isDemoUser}
             />
             <Button
               type="button"
               onClick={handleRefine}
-              disabled={loading || !hasConversation || !feedback.trim()}
+              disabled={
+                loading || !hasConversation || !feedback.trim() || isDemoUser
+              }
               className="w-full sm:w-auto"
+              title={isDemoUser ? "Not available in demo mode" : undefined}
             >
               {loading ? "Refining…" : "Send"}
             </Button>
